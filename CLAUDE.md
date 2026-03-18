@@ -103,7 +103,7 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Firm universe built
 [x] SIC codes added
 [x] Filters applied and manual review done (173 firms)
-[x] Financial panel collected (2,969 rows, 152 firms, 21 foreign filers dropped)
+[x] Financial panel collected (3,034 rows, 155 firms, 21 foreign filers dropped)
 [ ] Product text collected
 [ ] Replicability index built
 [ ] Switching costs built
