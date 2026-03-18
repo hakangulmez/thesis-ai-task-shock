@@ -99,11 +99,11 @@ All treatment vars: pre-Nov 2022 text ONLY
 - Never pool AI position groups
 
 ## Current status
-[ ] Folder structure created
-[ ] Firm universe built
-[ ] SIC codes added
-[ ] Filters applied and manual review done
-[ ] Financial panel collected
+[x] Folder structure created
+[x] Firm universe built
+[x] SIC codes added
+[x] Filters applied and manual review done (173 firms)
+[x] Financial panel collected (2,969 rows, 152 firms, 21 foreign filers dropped)
 [ ] Product text collected
 [ ] Replicability index built
 [ ] Switching costs built
