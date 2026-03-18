@@ -104,6 +104,8 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] SIC codes added
 [x] Filters applied and manual review done (173 firms)
 [x] Financial panel collected (2,982 rows, 143 firms, finalized)
+[x] 10-K business descriptions collected (143/143 firms)
+[x] Thesis plan written (THESIS_PLAN.md)
 [ ] Product text collected
 [ ] Replicability index built
 [ ] Switching costs built
