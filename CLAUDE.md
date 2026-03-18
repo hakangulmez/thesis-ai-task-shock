@@ -109,7 +109,7 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Product text collected (106 Wayback + 37 10-K fallback)
 [x] Replicability index built (SBERT, 143/143 firms)
 [ ] Switching costs built
-[ ] Master panel merged
+[x] Master panel merged (2,982 rows, 143 firms)
 [ ] DiD estimated
 [ ] Event study plotted
 [ ] Commodification test done
