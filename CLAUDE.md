@@ -110,7 +110,8 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Replicability index built (SBERT, 143/143 firms)
 [ ] Switching costs built
 [x] Master panel merged (2,982 rows, 143 firms)
-[ ] DiD estimated
+[x] DiD estimated (main results complete)
+[x] Parallel trends tested (all pass, 2020+ sample)
 [ ] Event study plotted
 [ ] Commodification test done
 [ ] Heterogeneity by position done

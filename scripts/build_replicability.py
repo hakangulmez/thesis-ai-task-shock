@@ -19,18 +19,28 @@ UNIVERSE_PATH = "data/raw/firm_universe_v1.csv"
 OUTPUT_PATH = "data/processed/replicability_scores.csv"
 
 ANCHOR_SENTENCES = [
+    # Communication and content
     "Draft and send personalized emails to customers",
-    "Summarize meeting notes and action items",
-    "Answer customer questions from a knowledge base",
-    "Generate reports from structured data",
-    "Extract information from documents and forms",
     "Write marketing copy and social media posts",
-    "Classify and route support tickets by topic",
+    "Generate product descriptions from specifications",
+    "Summarize documents and extract key information",
     "Translate text between languages",
-    "Generate code from natural language descriptions",
     "Create documentation from technical specifications",
-    "Schedule meetings and manage calendars",
-    "Search and retrieve information from databases",
+    # Knowledge and support
+    "Answer customer questions from a knowledge base",
+    "Classify and route support tickets by topic",
+    "Search and retrieve relevant information",
+    "Match candidates to job requirements",
+    # Analytics and reporting
+    "Generate reports and dashboards from structured data",
+    "Extract and transform data from forms and documents",
+    "Score and rank items based on rules and criteria",
+    "Monitor metrics and alert when thresholds are exceeded",
+    # Workflow and automation
+    "Automate repetitive data entry and processing tasks",
+    "Route requests through approval workflows",
+    "Schedule and coordinate tasks across teams",
+    "Process and reconcile transactions automatically",
 ]
 
 TOP_K = 10  # number of top sentences to average
