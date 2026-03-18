@@ -1,0 +1,5 @@
+requests
+pandas
+sentence-transformers
+scikit-learn
+tqdm
