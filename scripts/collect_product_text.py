@@ -24,8 +24,8 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 thesis-research contact: go52geg@tum.de"
 }
 
-CDX_WAIT = 3.0
-FETCH_WAIT = 5.0
+CDX_WAIT = 5.0
+FETCH_WAIT = 7.0
 RETRY_WAIT = 30
 TOP_N_PAGES = 3
 MIN_WORDS = 150
@@ -394,10 +394,6 @@ def main():
     t0 = time.time()
 
     df = pd.read_csv(INPUT_PATH)
-
-    # DRY RUN: only process these tickers
-    DRY_RUN = ["HUBS"]
-    df = df[df["ticker"].isin(DRY_RUN)].reset_index(drop=True)
 
     total = len(df)
     est_min = total * (CDX_WAIT + FETCH_WAIT * TOP_N_PAGES) / 60

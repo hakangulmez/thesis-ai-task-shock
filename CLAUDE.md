@@ -106,7 +106,7 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Financial panel collected (2,982 rows, 143 firms, finalized)
 [x] 10-K business descriptions collected (143/143 firms)
 [x] Thesis plan written (THESIS_PLAN.md)
-[ ] Product text collected
+[x] Product text collected (106 Wayback + 37 10-K fallback)
 [ ] Replicability index built
 [ ] Switching costs built
 [ ] Master panel merged
