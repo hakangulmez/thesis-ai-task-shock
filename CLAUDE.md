@@ -107,7 +107,7 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] 10-K business descriptions collected (143/143 firms)
 [x] Thesis plan written (THESIS_PLAN.md)
 [x] Product text collected (106 Wayback + 37 10-K fallback)
-[ ] Replicability index built
+[x] Replicability index built (SBERT, 143/143 firms)
 [ ] Switching costs built
 [ ] Master panel merged
 [ ] DiD estimated
