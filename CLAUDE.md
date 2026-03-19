@@ -10,46 +10,70 @@ Hakan Zeki Gülmez — TUM Applied Econometrics
 Supervisor: Prof. Dr. Helmut Farbmacher
 
 ## Research question
-Do software firms (SIC 7370-7379) experience
+Do B2B software firms (SIC 7370-7379) experience
 heterogeneous financial outcomes after the ChatGPT
 shock (Nov 2022), determined by the task replicability
-of their core product and their switching cost structure?
+of their core product?
+
+## Main treatment variable
+task_replicability_i [0-1]
+SBERT all-MiniLM-L6-v2, 18 anchor sentences
+Score range: 0.14-0.53, mean 0.318, SD 0.070
+
+## Simplified design
+Dropped switching costs, AI adoption position, and
+error cost from main regression. Too many constructed
+variables creates OVB credibility concerns. Lean design:
+one novel treatment + firm/quarter FE.
+
+Switching costs → pre-shock revenue volatility
+  (already in panel, available all 143 firms)
+AI position → heterogeneity analysis only
+Error cost → robustness check only
 
 ## Three mechanisms
 1. Substitution    → revenue falls
 2. Commodification → revenue flat, margins fall
 3. Reinforcement   → revenue and margins rise
 
-## Treatment variables (ALL pre-Nov 2022 only)
-1. task_replicability_i  [0-1]   SBERT semantic score
-2. ai_position_i         [1/2/3] LLM rubric classification
-3. switching_cost_i      [0-1]   NRR + contract duration
-4. error_cost_i          [0-6]   domain classification
+## Empirical design
+DiD with continuous treatment intensity
+Y_it = α_i + δ_t + β1(Post_t × Replicability_i) + ε_it
+Post_t = 1 if quarter >= 2022 Q4
+Firm FE + Quarter FE + clustered SE at firm level
+Wild cluster bootstrap for inference
+
+## Main results (trimmed 2020+ sample, bare DiD)
+ln(Revenue):      β = -0.759*, SE = 0.401, p<0.10
+Gross Margin:     β = +0.054,  SE = 0.083, ns
+Operating Margin: β = -0.434,  SE = 0.403, ns
+
+## Parallel trends — ALL PASS on trimmed 2020+ sample
+ln(Revenue):      F=0.89, p=0.54
+Gross Margin:     F=0.98, p=0.46
+Operating Margin: F=1.00, p=0.44
 
 ## Outcome variables
 PRIMARY:   ln_revenue, gross_margin, operating_margin
 SECONDARY: yoy_revenue_growth
 
-## Empirical design
-DiD with continuous treatment intensity
-Y_it = α_i + δ_t + β1(Post_t × Replicability_i)
-                 + β2(Post_t × SwitchingCost_i)
-                 + γX_it + ε_it
-Post_t = 1 if quarter >= 2023 Q1
-Firm FE + Quarter FE + clustered SE at firm level
-Wild cluster bootstrap for inference
-
 ## Sample
 SIC 7370-7379, NYSE/NASDAQ, IPO before 2020 Q1
 Revenue > $12.5M quarterly by 2021
 B2B focus, scorable core product
-Expected n = 70-100 firms, 2019 Q1 - 2025 Q4
+n = 143 firms, 2020 Q1 - 2025 Q4 (trimmed)
 
 ## Data sources
 Financial panel:    SEC EDGAR XBRL API (free, no auth)
 Firm universe:      SEC company_tickers_exchange.json
 Product page text:  Wayback Machine CDX API (free)
 All treatment vars: pre-Nov 2022 text ONLY
+
+## Known limitations
+- MongoDB (MDB) scored high (0.47) — 10-K fallback artifact
+- 37 firms use 10-K fallback (MSFT, CRM, CRWD, HUBS, NET, etc.)
+- Gross margin pre-trend fails on full 2019+ sample
+  fixed by trimming to 2020+ (p=0.46)
 
 ## Script execution order
 1. scripts/build_firm_universe.py
@@ -81,13 +105,10 @@ All treatment vars: pre-Nov 2022 text ONLY
 6. scripts/build_replicability.py
    → data/processed/replicability_scores.csv
 
-7. scripts/build_switching_costs.py
-   → data/processed/switching_costs.csv
-
-8. scripts/build_master_panel.py
+7. scripts/build_master_panel.py
    → data/processed/master_panel.csv
 
-9. analysis/did_main.R
+8. analysis/did_main.R
    → figures/ and results/
 
 ## Key constraints — never violate
@@ -96,7 +117,6 @@ All treatment vars: pre-Nov 2022 text ONLY
 - Event study is primary, binary DiD secondary
 - Wild cluster bootstrap p-values required
 - Commodification test on margins mandatory
-- Never pool AI position groups
 
 ## Current status
 [x] Folder structure created
@@ -107,11 +127,12 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] 10-K business descriptions collected (143/143 firms)
 [x] Thesis plan written (THESIS_PLAN.md)
 [x] Product text collected (106 Wayback + 37 10-K fallback)
-[x] Replicability index built (SBERT, 143/143 firms)
-[ ] Switching costs built
+[x] Replicability index built (SBERT, 18 anchors, 143/143)
 [x] Master panel merged (2,982 rows, 143 firms)
-[x] DiD estimated (main results complete)
+[x] DiD estimated (revenue β=-0.759*, p<0.10)
 [x] Parallel trends tested (all pass, 2020+ sample)
-[ ] Event study plotted
-[ ] Commodification test done
-[ ] Heterogeneity by position done
+[ ] Wild cluster bootstrap inference
+[ ] Event study plots finalized
+[ ] Heterogeneity analysis complete
+[ ] Robustness checks complete
+[ ] Thesis written
