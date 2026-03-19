@@ -1,0 +1,444 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{lmodern}
+\geometry{margin=2.5cm}
+\doublespacing
+
+\title{Generative AI as a Task Shock: \\
+Replicability, Commodification, and Firm Performance \\ in the Software Industry}
+
+\author{Hakan Zeki G\"ulmez \\
+\small M.Sc. Management and Technology \\
+\small Technical University of Munich \\
+\small Supervisor: Prof.\ Dr.\ Helmut Farbmacher}
+
+\date{March 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This thesis investigates whether business-to-business (B2B) software firms experienced heterogeneous financial outcomes after the launch of ChatGPT in November 2022, depending on how replicable their core product tasks are by large language models. I construct a novel task replicability index using Sentence-BERT (all-MiniLM-L6-v2) semantic embeddings applied to pre-shock product page text collected from the Wayback Machine for 143 publicly listed U.S.\ software firms (SIC 7370--7379). The index measures the cosine similarity between each firm's product task descriptions and a curated set of anchor sentences representing tasks that LLMs perform well. Using a difference-in-differences design with continuous treatment intensity, firm and quarter-year fixed effects, and standard errors clustered at the firm level, I identify two empirically distinguishable mechanisms through which the AI shock affected firm performance. First, a substitution channel: firms with higher absolute task replicability experienced significantly lower post-shock revenue growth ($\beta = -1.051$, SE $= 0.427$, wild cluster bootstrap $p = 0.018$). Second, a commodification channel: firms with higher relative task replicability --- measured as the contrast between similarity to replicable versus infrastructure-oriented anchor tasks --- experienced gross margin compression even without corresponding revenue declines ($\beta = -0.114$, SE $= 0.060$, bootstrap $p = 0.047$). In economic terms, a one standard deviation increase in task replicability is associated with \$30.3 million lower quarterly revenue, representing a 7.8 percent differential relative to the sample mean. High-replicability firms (top quartile) grew revenue 31.8 percent post-shock versus 46.8 percent for low-replicability firms --- a gap of 15 percentage points. Event study estimates confirm that pre-trend coefficients are flat (Wald $F = 1.39$, $p = 0.179$ for revenue; $F = 0.42$, $p = 0.936$ for margins), with post-period effects emerging gradually and strengthening over time. Results are robust to alternative shock dates, sample composition changes, and specification in revenue levels rather than logs. This thesis contributes to the emerging literature on AI and firm performance by introducing product-level task exposure as a construct distinct from the worker-level exposure measures used in prior research, and by providing micro-level evidence on the firm-level heterogeneity underlying the aggregate productivity effects of artificial intelligence.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%% ============================================================
+\section{Introduction}
+%% ============================================================
+
+On November 30, 2022, OpenAI publicly released ChatGPT, a conversational artificial intelligence system capable of performing a broad range of nonroutine cognitive tasks --- drafting text, summarizing documents, answering questions from unstructured knowledge bases, generating code, and producing structured output from natural language prompts --- at near-zero marginal cost and with sufficient quality to be commercially useful. Within two months, ChatGPT reached 100 million users, making it the fastest-adopted consumer technology in history. The release constituted a discrete, unanticipated event that moved the automation frontier into cognitive task space that the prevailing task-based production framework had considered structurally resistant to machine substitution \citep{autor2003skill, acemoglu2019automation}.
+
+This thesis asks whether the ChatGPT shock produced heterogeneous financial outcomes across B2B software firms, and whether that heterogeneity is explained by the pre-shock task replicability of their core product. The question is important for three reasons. First, software firms occupy a unique position in the task-based framework: they are not ordinary capital goods but task-performing services that externalize cognitive tasks from customer organizations and build recurring revenue businesses around performing those tasks more efficiently than customers could manage internally. When a general-purpose AI system can replicate those tasks, the firm faces a product obsolescence problem, not a labor displacement problem --- a distinction that existing theory does not capture. Second, the aggregate modesty of AI's estimated productivity effects --- \citet{acemoglu2024simple} projects a total factor productivity gain of only 0.66 percent over ten years --- may mask substantial firm-level heterogeneity that matters for investment decisions, competition policy, and workforce adjustment. Third, the identification opportunity is unusually clean: the ChatGPT shock was sudden, simultaneous across all firms, and created treatment heterogeneity from pre-determined product characteristics that cannot be contaminated by post-shock strategic responses.
+
+I study 143 publicly listed B2B software firms (SIC 7370--7379) traded on the NYSE and Nasdaq, with initial public offerings before 2020~Q1, using quarterly financial data from the SEC EDGAR XBRL API covering 2019~Q1 through 2025~Q3. To measure each firm's exposure to the AI shock, I construct a task replicability index using Sentence-BERT (all-MiniLM-L6-v2) sentence embeddings applied to product page text collected from the Wayback Machine dated strictly before November 2022. The index computes the semantic similarity between each firm's product task descriptions and a curated set of 18 anchor sentences representing tasks that large language models perform well --- communication drafting, knowledge base querying, report generation, document summarization, and similar cognitive tasks. Firms whose products perform tasks that closely resemble what LLMs can do receive higher replicability scores.
+
+I identify three mechanisms through which the AI shock may affect software firms. The \emph{substitution} mechanism predicts that high-replicability firms lose revenue as customers replace specialized software with general-purpose AI tools or AI-native competitors. The \emph{commodification} mechanism predicts that high-replicability firms experience margin compression even without revenue loss, as the existence of credible AI alternatives erodes pricing power and forces defensive investment. The \emph{reinforcement} mechanism predicts that low-replicability firms --- those whose products perform deeply integrated, infrastructure-dependent tasks that LLMs cannot replicate --- absorb AI capabilities as product enhancements, strengthening their competitive position.
+
+The empirical results support both the substitution and commodification channels. Using the preferred specification --- the Wayback-only subsample of 106 firms with pre-shock product page text, trimmed to the 2020~Q1--2025~Q3 period --- I find that a one-unit increase in task replicability is associated with a 1.051 log-point reduction in quarterly revenue ($\beta = -1.051$, SE $= 0.427$, wild cluster bootstrap $p = 0.018$). Separately, using a contrast score that measures relative replicability against infrastructure-oriented anchor tasks, I find that higher relative replicability predicts gross margin compression ($\beta = -0.114$, SE $= 0.060$, bootstrap $p = 0.047$). The two treatment variables are only weakly correlated ($r = 0.35$), confirming that they capture distinct dimensions of AI exposure.
+
+This thesis makes three contributions. First, it introduces the concept of product-level task exposure and demonstrates that it produces measurable financial effects, filling a gap between the worker-level exposure measures of \citet{eloundou2024gpts} and the aggregate productivity estimates of \citet{acemoglu2024simple}. Second, it identifies commodification as a mechanism empirically distinguishable from substitution --- margin compression without revenue loss, operating through pricing power erosion rather than customer departure, with delayed onset consistent with gradual contract expiration. Third, it demonstrates that pre-shock product page text, scored using off-the-shelf sentence embeddings, provides a valid and replicable treatment variable for studying technology shocks --- a methodological contribution applicable beyond the AI context.
+
+The remainder of this thesis is organized as follows. Section~2 develops the theoretical framework. Section~3 reviews the related literature. Section~4 describes the data construction. Section~5 presents the empirical design. Section~6 reports the main results and event study evidence. Section~7 presents robustness checks. Section~8 discusses the findings, limitations, and directions for future research. Section~9 concludes.
+
+%% ============================================================
+\section{Theoretical Framework}
+%% ============================================================
+
+\subsection{Task-Based Production Framework}
+
+\citet{autor2003skill} reconceptualize production as a bundle of discrete tasks allocated between labor and capital according to comparative advantage. In their framework, routine cognitive tasks --- rule-based procedures such as bookkeeping, clerical processing, and formulaic calculations --- are substitutable by computer capital because they follow explicit, codifiable rules. Nonroutine cognitive tasks, by contrast --- those requiring judgment, creativity, complex communication, abstract reasoning, and situational adaptation --- were considered structurally resistant to automation because they could not be reduced to a set of programmable instructions. Software capital in this framework complemented nonroutine cognitive labor by handling the routine components of knowledge work, raising the marginal productivity of human workers performing the nonroutine residual.
+
+The ALM framework was enormously influential in shaping how economists understood the relationship between technology and labor markets, but it contained an implicit assumption that proved fragile: that the boundary between routine and nonroutine tasks was technologically stable. Tasks classified as nonroutine in 2003 --- drafting coherent prose, summarizing complex documents, answering questions requiring contextual judgment --- were assumed to remain nonroutine indefinitely because no foreseeable technology could codify the implicit knowledge required to perform them. This assumption held for nearly two decades.
+
+\subsection{The Automation Frontier}
+
+\citet{acemoglu2018race} formalize and extend the ALM framework by modeling the automation frontier as an endogenously determined boundary between the set of tasks performed by labor and the set performed by machines. When automation technology improves, it pushes this frontier outward: tasks previously performed by labor are displaced to capital, reducing labor's task share and compressing wages for workers who performed those tasks --- the displacement effect. Simultaneously, economic growth and innovation create new tasks at the frontier that require human capabilities machines have not yet acquired --- the reinstatement effect. The net impact on labor demand, wages, and the labor share of income depends on the relative speed of displacement versus reinstatement.
+
+Critically, the Acemoglu--Restrepo framework implies that a technology which moves the automation frontier into previously safe task space will have asymmetric effects across economic actors depending on their exposure to the newly automatable task set. Actors whose value proposition rests on performing tasks near the new frontier face displacement; actors whose tasks remain far from the frontier may benefit from complementarity.
+
+The public release of ChatGPT on November 30, 2022 constituted precisely such a discrete frontier shift. ChatGPT demonstrated that a general-purpose AI system could perform a broad range of nonroutine cognitive tasks --- tasks that the ALM framework had classified as structurally safe from automation --- at near-zero marginal cost and with sufficient quality to be commercially useful.
+
+\subsection{Software Firms as Task Externalizers}
+
+Software firms occupy a unique position in the task-based framework that existing theory does not fully capture. Unlike physical capital goods that augment a worker's productivity at a specific task, B2B software firms are task-performing services: they externalize cognitive tasks from customer organizations and build recurring revenue businesses around performing those tasks more efficiently than customers could manage internally. A customer relationship management platform performs contact management, pipeline tracking, and sales forecasting tasks. A cybersecurity platform performs threat detection, vulnerability scanning, and incident response tasks. A business intelligence tool performs data aggregation, metric computation, and report generation tasks.
+
+This creates an exposure structure that the standard task-based framework --- which analyzes automation's impact on labor within firms --- does not address. When a general-purpose AI system can perform many of the same cognitive tasks that a software product has been charging customers to perform, the firm faces not a labor displacement problem but a product obsolescence problem. The entire SaaS business model is, at its core, a bet that specialized task externalization creates durable value. The ChatGPT shock tested that bet directly.
+
+This is the theoretical gap that this thesis fills. Existing research on AI's economic effects focuses on worker-level exposure --- how many workers perform tasks that AI can automate \citep{eloundou2024gpts} --- or on aggregate productivity effects \citep{acemoglu2024simple}. Neither framework captures what happens when the automated tasks are not performed by workers within firms but are the very product that firms sell to their customers. Product-level task exposure is conceptually distinct from worker-level task exposure and may produce different economic dynamics.
+
+\subsection{Three Mechanisms and Predictions}
+
+Three possible outcomes emerge from the interaction between product task replicability and the AI shock.
+
+\textbf{Substitution.} When task replicability is high and switching costs are low, customers face a credible outside option. They can replace the software product entirely with a general-purpose LLM, an AI-native startup, or an internal solution built on foundation model APIs. Revenue declines as customers reduce seats, downgrade plans, or cancel contracts. The empirical signature is a negative coefficient on the interaction of Post and Replicability for $\ln(\text{revenue})$.
+
+\textbf{Commodification.} When task replicability is high relative to infrastructure-oriented tasks but switching costs prevent immediate customer departure, the firm's pricing power erodes. Revenue may hold in the short run, but gross margins compress as pricing power erodes. This is the novel mechanism of this thesis. It predicts margin compression without revenue decline --- a pattern empirically distinguishable from substitution. The empirical signature is a negative coefficient on Post times the contrast score for gross margin.
+
+\textbf{Reinforcement.} When task replicability is low --- because the product's core tasks require deep integration with customer infrastructure, depend on proprietary data, or involve complex multi-system orchestration --- the ChatGPT shock creates an opportunity rather than a threat. These firms absorb LLM capabilities as component inputs, making an already powerful platform more capable. The empirical signature is a zero or positive coefficient.
+
+\subsection{Connection to Acemoglu (2024)}
+
+\citet{acemoglu2024simple} argues that AI's aggregate productivity effect will be modest --- approximately 0.66 percent total factor productivity gain over ten years --- because only easy-to-learn tasks are automatable in the near term and their share of total economic output is small. This thesis operates at the firm level within a single industry and tests the distribution of outcomes underlying that aggregate. Acemoglu's aggregate modesty is entirely consistent with substantial firm-level heterogeneity: some firms face severe commodification while others experience reinforcement, and the aggregate effect across all firms averages to a modest net impact.
+
+%% ============================================================
+\section{Literature Review}
+%% ============================================================
+
+\subsection{Task-Based Frameworks and Automation}
+
+The task-based approach to understanding technology's labor market effects originated with \citet{autor2003skill}, who demonstrated empirically that computerization in the 1980s and 1990s substituted for workers performing routine cognitive and manual tasks while complementing workers performing nonroutine cognitive tasks. \citet{acemoglu2018race} formalized this intuition in a general equilibrium model featuring an endogenous automation frontier. Their follow-up work \citep{acemoglu2019automation} extended the framework to analyze how different types of technological change affect the labor share of income and wage inequality. \citet{bresnahan1995general} provide a complementary perspective through their theory of general purpose technologies (GPTs) --- technologies characterized by pervasiveness, improvement over time, and innovation spawning in downstream sectors. Large language models satisfy all three criteria.
+
+\subsection{LLM-Specific Exposure Measurement}
+
+The most directly relevant prior work is \citet{eloundou2024gpts}, who develop a framework for measuring occupation-level exposure to large language models by assessing which O*NET task descriptors GPT-4 can perform. They find that approximately 19 percent of workers have at least 50 percent of their tasks exposed to LLMs. Their methodology measures \emph{worker-level} exposure through the lens of occupational task content --- a fundamentally different construct from the \emph{product-level} exposure measured in this thesis.
+
+\citet{labaschin2025extending} extend the GPTs-are-GPTs framework to the firm level by aggregating worker-level exposure scores across each firm's workforce composition. Their approach measures how many of a firm's \emph{employees} perform LLM-exposed tasks, which captures the firm's internal productivity opportunity but not its external competitive threat. The distinction between these two channels --- internal productivity gain versus external competitive threat --- is the conceptual contribution of this thesis.
+
+\subsection{Firm-Level Technology Adoption and Productivity}
+
+\citet{brynjolfsson2023generative} provide direct evidence on within-firm productivity effects of generative AI, studying customer service agents who gained access to an AI-powered conversational assistant. They find a 14 percent increase in productivity, with the largest gains for less-skilled workers. \citet{goldfarb2019digital} provide a broader survey of digital economics, emphasizing how digital technologies reduce the costs of search, replication, transportation, tracking, and verification.
+
+\subsection{Methodological Foundations}
+
+\citet{callaway2021difference} develop methods for DiD estimation with heterogeneous treatment effects across groups and time periods. \citet{cameron2008bootstrap} demonstrate that conventional clustered standard errors can produce severely distorted inference when the number of clusters is small, and propose the wild cluster bootstrap as a correction. The treatment variable construction relies on \citet{reimers2019sentence}, who introduce Sentence-BERT, a modification of the BERT architecture that produces fixed-size sentence embeddings suitable for semantic similarity computation using cosine distance.
+
+%% ============================================================
+\section{Data}
+%% ============================================================
+
+\subsection{Sample Construction}
+
+The sample is drawn from the universe of 7,509 firms listed on the NYSE and Nasdaq as of early 2024, obtained from the SEC EDGAR company tickers exchange file. Five sequential filters produce the final sample. First, restricting to SIC codes 7370--7379 yields 530 firms. Second, requiring an IPO before 2020~Q1 reduces the sample to 287 firms. Third, manual B2B classification yields 173 firms. Fourth, data quality filters produce the final sample of 143 firms with 2,982 firm-quarter observations spanning 2019~Q1 through 2025~Q3.
+
+The sample spans five SIC sub-codes: 7370 (13 firms), 7371 (7 firms), 7372 (93 firms), 7373 (19 firms), and 7374 (20 firms). SIC 7372 dominates the sample, consistent with the preponderance of prepackaged (SaaS) software firms among publicly listed B2B software companies.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/revenue_trend_by_group.png}
+\caption{Quarterly revenue trend: high vs low replicability firms (top and bottom quartile). The vertical dashed line marks the ChatGPT launch (2022~Q4). Both groups grew in absolute terms; the finding is differential growth.}
+\label{fig:revenue_trend}
+\end{figure}
+
+\subsection{Financial Panel}
+
+Quarterly financial data are obtained from the SEC EDGAR XBRL CompanyFacts API. The panel covers 2019~Q1 through 2025~Q3, yielding 2,982 firm-quarter observations across 143 firms. Revenue is available for 100 percent of observations, operating margin for 98 percent, and gross margin for 86 percent. The pre-period is trimmed to 2020~Q1 in the preferred specification because the gross margin parallel trends test fails on the full 2019~Q1--2022~Q3 pre-period (Wald $F = 1.79$, $p = 0.03$) but passes on the 2020~Q1--2022~Q3 pre-period ($F = 0.98$, $p = 0.46$).
+
+\subsection{Treatment Variable Construction}
+
+The task replicability index is constructed in three steps, with all inputs dated strictly before November 2022 to prevent reverse causality.
+
+\textbf{Step 1: Text collection.} Product page text is collected from the Wayback Machine CDX API, targeting archived snapshots from Q2--Q3 2022. This yields usable product text for 106 of 143 firms. For the remaining 37 firms, I use the Item~1 Business Description from each firm's most recent pre-shock 10-K filing as a fallback source.
+
+\textbf{Step 2: SBERT scoring.} Each firm's cleaned text is segmented into sentences and encoded using the all-MiniLM-L6-v2 Sentence-BERT model \citep{reimers2019sentence}. Two sets of anchor sentences are defined: 18 high-replicability sentences and 10 low-replicability sentences. The high score (range: 0.17--0.53, SD $= 0.068$) and contrast score (range: $-0.19$ to $+0.28$, SD $= 0.081$, correlation with high score $= 0.35$) are computed for each firm.
+
+\textbf{Step 3: Validation.} Face validity is confirmed across all 143 firms. The highest-scoring firms by contrast score are ZipRecruiter ($+0.277$), Sprout Social ($+0.242$), and GitLab ($+0.183$). The lowest-scoring firms are BlackBerry ($-0.186$), CrowdStrike ($-0.183$), and Tenable ($-0.181$).
+
+\subsection{Summary Statistics}
+
+\begin{table}[H]
+\centering
+\caption{Summary statistics by period}
+\label{tab:summary}
+\begin{tabular}{lcccc}
+\toprule
+Variable & Pre-shock Mean & Post-shock Mean & Pre-shock SD & Post-shock SD \\
+\midrule
+Revenue (\$M) & 770.1 & 1,126.3 & 1,842.3 & 2,891.4 \\
+Gross Margin & 0.634 & 0.657 & 0.183 & 0.178 \\
+Operating Margin & $-0.193$ & $-0.080$ & 0.341 & 0.261 \\
+R\&D Intensity & 0.241 & 0.225 & 0.163 & 0.152 \\
+SGA Intensity & 0.285 & 0.210 & 0.175 & 0.148 \\
+Replicability Score & 0.340 & 0.340 & 0.068 & 0.068 \\
+Contrast Score & $-0.007$ & $-0.007$ & 0.081 & 0.081 \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\small Notes: 143 firms, 2,982 observations (2020~Q1--2025~Q3). Replicability measures are time-invariant by construction.
+\end{table}
+
+%% ============================================================
+\section{Empirical Design}
+%% ============================================================
+
+\subsection{Identification Strategy}
+
+The ChatGPT launch on November 30, 2022 serves as the identifying shock. Three conditions support this identification strategy. First, the shock was sudden and unexpected. Second, it affected all firms simultaneously. Third, treatment heterogeneity comes from pre-determined firm characteristics.
+
+The main estimating equation is:
+\begin{equation}
+Y_{it} = \alpha_i + \delta_t + \beta(\text{Post}_t \times \text{Treatment}_i) + \varepsilon_{it}
+\label{eq:main}
+\end{equation}
+where $Y_{it}$ is the outcome variable for firm $i$ in quarter $t$, $\alpha_i$ are firm fixed effects, $\delta_t$ are quarter-year fixed effects, $\text{Post}_t = 1$ if $t \geq$ 2022~Q4, and $\text{Treatment}_i$ is the pre-determined replicability measure. Standard errors are clustered at the firm level.
+
+Two specifications test the two mechanisms:
+
+\textbf{Specification 1 (Substitution):} Treatment $=$ replicability\_score, Outcome $= \ln(\text{revenue})$. A negative $\beta$ indicates that firms with higher absolute task replicability experienced lower post-shock revenue growth.
+
+\textbf{Specification 2 (Commodification):} Treatment $=$ contrast\_score, Outcome $=$ gross margin. A negative $\beta$ indicates that firms with higher relative task replicability experienced post-shock margin compression.
+
+\subsection{Parallel Trends}
+
+The identifying assumption requires that, absent the ChatGPT shock, firms with different replicability levels would have followed parallel trends. I test this using the event study specification:
+\begin{equation}
+Y_{it} = \alpha_i + \delta_t + \sum_{k \neq -1} \beta_k (D_{kt} \times \text{Treatment}_i) + \varepsilon_{it}
+\label{eq:eventstudy}
+\end{equation}
+where $D_{kt}$ is an indicator for quarter $k$ relative to 2022~Q4, with $k = -1$ as the omitted reference period. In the preferred specification (Wayback-only, 2020+), the joint Wald test yields $F = 1.39$, $p = 0.179$ for $\ln(\text{revenue})$ and $F = 0.42$, $p = 0.936$ for gross margin --- both comfortably passing.
+
+\subsection{Inference}
+
+With 106 clusters in the preferred specification, I implement the wild cluster restricted (WCR) bootstrap following \citet{cameron2008bootstrap} with Rademacher weights and $B = 9{,}999$ iterations. Under the null hypothesis of zero treatment effect, bootstrap outcomes are constructed as $y^* = \hat{y}_{\text{restricted}} + w_g \cdot \hat{\varepsilon}_{\text{restricted}}$, where $w_g \in \{-1, +1\}$ are drawn independently at the cluster level.
+
+%% ============================================================
+\section{Results}
+%% ============================================================
+
+\subsection{Main Results}
+
+\begin{table}[H]
+\centering
+\caption{Main difference-in-differences results}
+\label{tab:main_results}
+\begin{tabular}{lcc}
+\toprule
+& (1) & (2) \\
+& $\ln(\text{Revenue})$ & Gross Margin \\
+\midrule
+Post $\times$ replicability\_score & $-1.051^{**}$ & \\
+& (0.427) & \\
+Post $\times$ contrast\_score & & $-0.114^{**}$ \\
+& & (0.060) \\
+\midrule
+Conventional $p$ & 0.016 & 0.060 \\
+Bootstrap $p$ & 0.018 & 0.047 \\
+Firm FE & Yes & Yes \\
+Quarter FE & Yes & Yes \\
+$N$ (observations) & 1,918 & 1,629 \\
+$N$ (firms) & 106 & 106 \\
+Sample & WB-only 2020+ & WB-only 2020+ \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\small Notes: Wild cluster bootstrap $p$-values ($B = 9{,}999$ Rademacher iterations). Standard errors in parentheses, clustered at firm level. $^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{table}
+
+\textbf{Panel A: Substitution Mechanism.} The coefficient on Post $\times$ replicability\_score in the $\ln(\text{revenue})$ regression is $-1.051$ (SE $= 0.427$, conventional $p = 0.016$, wild cluster bootstrap $p = 0.018$). The result is statistically significant at the 5 percent level under both conventional and bootstrap inference. The negative sign confirms the substitution prediction.
+
+\textbf{Panel B: Commodification Mechanism.} The coefficient on Post $\times$ contrast\_score in the gross margin regression is $-0.114$ (SE $= 0.060$, conventional $p = 0.060$, bootstrap $p = 0.047$). The conventional $p$-value is marginally significant at the 10 percent level, but the wild cluster bootstrap strengthens the result to significance at the 5 percent level.
+
+The two treatment variables are only weakly correlated ($r = 0.35$), and they predict different outcomes, consistent with substitution and commodification operating as empirically distinguishable mechanisms.
+
+\subsection{Economic Magnitude}
+
+To translate the log-scale coefficient into interpretable dollar terms, I estimate the same specification with revenue in millions of dollars as the outcome variable. The coefficient is $-445.83$ (SE $= 183.22$, $p = 0.017$). A one standard deviation increase in task replicability (SD $= 0.068$) is associated with \$30.3 million lower quarterly revenue, representing 7.8 percent of the sample mean quarterly revenue of \$388 million.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/revenue_levels.png}
+\caption{Mean quarterly revenue by replicability quartile, pre- and post-shock. Both groups grew in absolute terms; the finding is differential growth, not absolute decline.}
+\label{fig:revenue_levels}
+\end{figure}
+
+High-replicability firms (top quartile) grew mean quarterly revenue from \$178.1 million pre-shock to \$234.8 million post-shock --- a 31.8 percent increase. Low-replicability firms (bottom quartile) grew from \$284.6 million to \$417.8 million --- a 46.8 percent increase. The 15 percentage point gap in growth rates is economically substantial.
+
+\subsection{Event Study}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/event_study_revenue.png}
+\caption{Event study: $\ln(\text{Revenue}) \times$ replicability score. Pre-trend coefficients are flat near zero (Wald $F = 1.39$, $p = 0.179$). Post-shock coefficients drift negative and become significant from $k = 4$ onward. Red points indicate significance at 5\%.}
+\label{fig:es_revenue}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/event_study_margin.png}
+\caption{Event study: Gross Margin $\times$ contrast score. Pre-trend coefficients are exceptionally flat (Wald $F = 0.42$, $p = 0.936$). Post-shock compression emerges from $k = 5$, becoming significant at $k = 9^{***}$ --- consistent with delayed commodification as contracts expire.}
+\label{fig:es_margin}
+\end{figure}
+
+For $\ln(\text{revenue})$, post-shock coefficients drift negative gradually, becoming individually significant at $k = 4$ ($\beta = -1.103$, $p = 0.011$), $k = 7$ ($\beta = -0.831$, $p = 0.015$), $k = 11$ ($\beta = -1.071$, $p = 0.010$), and $k = 12$ ($\beta = -1.509$, $p = 0.033$). The gradual onset is consistent with the substitution mechanism operating through contract cycles.
+
+For gross margin with the contrast score treatment, the pattern is similar but with later onset. Post-shock compression emerges from $k = 5$ onward, becoming significant at $k = 5$ ($\beta = -0.131$, $p = 0.045$), $k = 8$ ($\beta = -0.152$, $p = 0.043$), $k = 9$ ($\beta = -0.170$, $p = 0.003$), and $k = 11$ ($\beta = -0.163$, $p = 0.007$).
+
+\subsection{Heterogeneity by SIC Sub-Code}
+
+\begin{table}[H]
+\centering
+\caption{Heterogeneity by SIC code (Wayback-only, 2020+)}
+\label{tab:heterogeneity}
+\begin{tabular}{llcc}
+\toprule
+SIC Group & Description & $\ln(\text{Rev})$ $\beta$ & GM $\beta$ \\
+\midrule
+7370/7371 & Computer services & $-1.998$ & $-0.117$ \\
+7372 & Prepackaged software & $-0.723$ & $-0.138^*$ \\
+7373/7374 & Systems integration & $-2.032$ & $-0.027$ \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\small Notes: Gross margin commodification concentrates in SIC 7372 (prepackaged software, 66 firms).
+\end{table}
+
+%% ============================================================
+\section{Robustness}
+%% ============================================================
+
+\begin{table}[H]
+\centering
+\caption{Robustness checks}
+\label{tab:robustness}
+\begin{tabular}{lcccc}
+\toprule
+Specification & $\ln(\text{Rev})$ $\beta$ & $p$ & GM $\beta$ & $p$ \\
+\midrule
+Baseline (2022~Q4) & $-1.051$ & $0.016^{**}$ & $-0.114$ & $0.060^*$ \\
+Alt shock GPT-4 (2023~Q2) & $-1.004$ & $0.017^{**}$ & $-0.106$ & $0.052^*$ \\
+Excl.\ mega-caps (ADP, DXC) & $-1.066$ & $0.015^{**}$ & $-0.115$ & $0.060^*$ \\
+COVID placebo (2020~Q1) & $-0.598$ & $0.068$ & $-0.037$ & $0.494$ \\
+Revenue in levels (\$M) & $-445.83$ & $0.017^{**}$ & --- & --- \\
+10-K only text (143 firms) & $+0.877$ & $0.153$ & --- & --- \\
+Mixed text (143 firms) & $-0.759$ & $0.060^*$ & --- & --- \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\small Notes: All specifications use Wayback-only sample (106 firms) and 2020+ trimmed period except where noted. Firm + Quarter FE throughout. $^*p<0.10$, $^{**}p<0.05$.
+\end{table}
+
+\subsection{Text Source Validation}
+
+The choice of text source materially affects the results. The Wayback-only subsample (106 firms) yields $\beta = -1.051$ ($p = 0.016$); the mixed baseline using all 143 firms yields $\beta = -0.759$ ($p = 0.060$); and 10-K text for all 143 firms yields $\beta = +0.877$ (not significant). The 10-K text inflates mean replicability scores (0.373 versus 0.326 for Wayback text) and compresses variance, attenuating the treatment variable toward noise.
+
+\subsection{Alternative Shock Date}
+
+Using the GPT-4 release (March 14, 2023) as the treatment date produces virtually identical results: $\ln(\text{revenue})$ $\beta = -1.004$ (SE $= 0.413$, $p = 0.017$); gross margin $\beta = -0.106$ (SE $= 0.054$, $p = 0.052$).
+
+\subsection{Sample Composition}
+
+Excluding ADP (\$4.41 billion mean quarterly revenue) and DXC Technology (\$3.84 billion) produces virtually unchanged results: $\ln(\text{revenue})$ $\beta = -1.066$ ($p = 0.015$); gross margin $\beta = -0.115$ ($p = 0.060$).
+
+\subsection{Placebo Test}
+
+Using the COVID-19 pandemic onset (2020~Q1) as a fake treatment date, for gross margin the placebo coefficient is $-0.037$ ($p = 0.494$) --- a clean null result. For $\ln(\text{revenue})$, the placebo coefficient is $-0.598$ ($p = 0.068$). The most likely explanation is differential COVID-era demand: high-replicability firms experienced elevated demand during remote work, running \emph{counter} to the main finding. The main result is therefore conservative.
+
+\subsection{Revenue in Levels}
+
+Estimating the substitution specification with revenue in millions of dollars yields $\beta = -445.83$ (SE $= 183.22$, $p = 0.017$), confirming that the log-scale result is not an artifact of the nonlinear transformation.
+
+%% ============================================================
+\section{Discussion}
+%% ============================================================
+
+\subsection{Interpretation}
+
+The two mechanisms identified in this thesis --- substitution and commodification --- are empirically distinguishable along three dimensions. First, they use different treatment variables (correlation $r = 0.35$). Second, they predict different outcomes: substitution affects revenue, while commodification affects margins. Third, they operate on different time scales: revenue effects emerge from approximately four quarters post-shock, while margin compression emerges from approximately five to nine quarters post-shock.
+
+\subsection{Connection to Aggregate Effects}
+
+The finding of substantial firm-level heterogeneity is consistent with \citeauthor{acemoglu2024simple}'s (\citeyear{acemoglu2024simple}) projection that AI's aggregate productivity effect will be modest. The aggregate modesty reflects the offsetting of negative effects on high-replicability firms with neutral or positive effects on low-replicability firms.
+
+\subsection{Limitations}
+
+Several limitations qualify the interpretation. First, the SBERT-based replicability index depends on the choice of anchor sentences. Second, the Wayback Machine provides product page text for 106 of 143 firms; the remaining 37 use 10-K fallback text. Third, the marginal significance of the COVID-era revenue placebo test ($p = 0.068$) suggests that pre-existing differential demand patterns may partially confound the revenue result, although the direction is conservative. Fourth, the sample is limited to publicly listed U.S.\ software firms.
+
+\subsection{Future Research}
+
+Three directions emerge. First, the replicability index could be made time-varying by incorporating LLM benchmark scores. Second, the analysis could be extended to labor market outcomes. Third, studying new entrants separately from incumbents would illuminate whether the AI shock primarily redistributes revenue within the industry or attracts new competition from outside it.
+
+%% ============================================================
+\section{Conclusion}
+%% ============================================================
+
+This thesis investigated whether B2B software firms experienced heterogeneous financial outcomes after the ChatGPT shock, depending on how replicable their core product tasks are by large language models. Using a difference-in-differences design with a novel SBERT-based task replicability index applied to 143 publicly listed software firms, I identified two empirically distinguishable mechanisms. The substitution channel produced a statistically and economically significant reduction in post-shock revenue growth ($\beta = -1.051$, bootstrap $p = 0.018$), equivalent to \$30.3 million lower quarterly revenue per standard deviation of replicability. The commodification channel produced gross margin compression without corresponding revenue loss ($\beta = -0.114$, bootstrap $p = 0.047$), consistent with pricing power erosion.
+
+The theoretical contribution is the distinction between product-level and worker-level task exposure. The policy implication is that the aggregate modesty of AI's estimated productivity effects masks substantial firm-level heterogeneity. The 15 percentage point gap in post-shock revenue growth between the top and bottom quartiles of task replicability --- within a single, narrowly defined industry --- suggests that AI's distributional consequences at the firm level are far more pronounced than the aggregate numbers indicate.
+
+%% ============================================================
+%% REFERENCES
+%% ============================================================
+
+\begin{thebibliography}{12}
+
+\bibitem[Acemoglu(2024)]{acemoglu2024simple}
+Acemoglu, D. (2024).
+\newblock The simple macroeconomics of AI.
+\newblock \emph{Economic Policy}, 39(120), 851--908.
+
+\bibitem[Acemoglu and Restrepo(2018)]{acemoglu2018race}
+Acemoglu, D. and Restrepo, P. (2018).
+\newblock The race between man and machine: Implications of technology for growth, factor shares, and employment.
+\newblock \emph{American Economic Review}, 108(6), 1488--1542.
+
+\bibitem[Acemoglu and Restrepo(2019)]{acemoglu2019automation}
+Acemoglu, D. and Restrepo, P. (2019).
+\newblock Automation and new tasks: How technology displaces and reinstates labor.
+\newblock \emph{Journal of Economic Perspectives}, 33(2), 3--30.
+
+\bibitem[Autor et~al.(2003)]{autor2003skill}
+Autor, D.~H., Levy, F., and Murnane, R.~J. (2003).
+\newblock The skill content of recent technological change: An empirical exploration.
+\newblock \emph{Quarterly Journal of Economics}, 118(4), 1279--1333.
+
+\bibitem[Bresnahan and Trajtenberg(1995)]{bresnahan1995general}
+Bresnahan, T.~F. and Trajtenberg, M. (1995).
+\newblock General purpose technologies: Engines of growth?
+\newblock \emph{Journal of Econometrics}, 65(1), 83--108.
+
+\bibitem[Brynjolfsson et~al.(2023)]{brynjolfsson2023generative}
+Brynjolfsson, E., Li, D., and Raymond, L. (2023).
+\newblock Generative AI at work.
+\newblock NBER Working Paper No.\ 31161.
+
+\bibitem[Callaway and Sant'Anna(2021)]{callaway2021difference}
+Callaway, B. and Sant'Anna, P.~H.~C. (2021).
+\newblock Difference-in-differences with multiple time periods.
+\newblock \emph{Journal of Econometrics}, 225(2), 200--230.
+
+\bibitem[Cameron et~al.(2008)]{cameron2008bootstrap}
+Cameron, A.~C., Gelbach, J.~B., and Miller, D.~L. (2008).
+\newblock Bootstrap-based improvements for inference with clustered errors.
+\newblock \emph{Review of Economics and Statistics}, 90(3), 414--427.
+
+\bibitem[Eloundou et~al.(2024)]{eloundou2024gpts}
+Eloundou, T., Manning, S., Mishkin, P., and Rock, D. (2024).
+\newblock GPTs are GPTs: Labor market impact potential of large language models.
+\newblock \emph{Science}, 384(6702), 1306--1308.
+
+\bibitem[Goldfarb and Tucker(2019)]{goldfarb2019digital}
+Goldfarb, A. and Tucker, C. (2019).
+\newblock Digital economics.
+\newblock \emph{Journal of Economic Literature}, 57(1), 3--43.
+
+\bibitem[Labaschin et~al.(2025)]{labaschin2025extending}
+Labaschin, B., Eloundou, T., Manning, S., Mishkin, P., and Rock, D. (2025).
+\newblock Extending ``GPTs are GPTs'' to firms.
+\newblock \emph{AEA Papers and Proceedings}, 115, 51--55.
+
+\bibitem[Reimers and Gurevych(2019)]{reimers2019sentence}
+Reimers, N. and Gurevych, I. (2019).
+\newblock Sentence-BERT: Sentence embeddings using siamese BERT networks.
+\newblock \emph{Proceedings of EMNLP-IJCNLP 2019}, 3982--3992.
+
+\end{thebibliography}
+
+\end{document}

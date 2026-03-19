@@ -170,3 +170,5 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Heterogeneity analysis complete
 [x] Robustness checks complete (3/3)
 [x] Thesis written
+[x] THESIS_FINAL.md with figures and tables
+[x] thesis.tex LaTeX version created

@@ -1,0 +1,8 @@
+"Check","Rev_Beta","Rev_SE","Rev_p","Rev_sig","GM_Beta","GM_SE","GM_p","GM_sig"
+"Baseline (2022 Q4)",-1.051,0.427,0.016,"**",-0.114,0.06,0.06,"*"
+"Alt shock GPT-4 (2023 Q2)",-1.004,0.413,0.017,"**",-0.106,0.054,0.052,"*"
+"Excl. mega-caps (ADP, DXC)",-1.066,0.427,0.015,"**",-0.115,0.06,0.06,"*"
+"COVID placebo (2020 Q1)",-0.598,0.34,0.068,"",-0.037,0.055,0.494,"PASS"
+"Revenue in levels ($M)",-445.83,183.22,0.017,"**",NA,NA,NA,NA
+"10-K only text (143 firms)",0.877,0.611,0.153,"",NA,NA,NA,NA
+"Mixed text (143 firms)",-0.759,0.401,0.06,"*",NA,NA,NA,NA

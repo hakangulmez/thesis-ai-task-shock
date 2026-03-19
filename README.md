@@ -164,6 +164,8 @@ figures/
   heterogeneity_sic.png      — SIC code heterogeneity
   robustness_checks.png      — robustness comparison
 results/                      — regression tables
+THESIS_FINAL.md               — thesis with figure references
+thesis.tex                    — LaTeX version
 notebooks/
   project_overview.ipynb      — full research notebook
 ```
@@ -207,4 +209,4 @@ Completed:
 - Research notebook with all figures
 
 Remaining:
-- Thesis writing
+- Final thesis formatting and submission

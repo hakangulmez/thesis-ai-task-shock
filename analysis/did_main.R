@@ -962,3 +962,106 @@ cat("\nAll regressions: Firm + Quarter FE, clustered SE, Wayback-only, 2020+\n")
 cat("* p<0.10, ** p<0.05, *** p<0.01\n")
 
 cat("\nDone. All outputs saved to results/ and figures/\n")
+
+# =============================================================
+# 12. SUMMARY STATISTICS TABLE (Table 1)
+# =============================================================
+
+cat("\n")
+cat("=" , rep("=", 69), "\n", sep = "")
+cat("TABLE 1: SUMMARY STATISTICS\n")
+cat("=" , rep("=", 69), "\n\n", sep = "")
+
+vars <- c("revenue", "gross_margin",
+          "operating_margin",
+          "rd_intensity", "sga_intensity")
+
+stats_list <- list()
+for (v in vars) {
+  for (p in c("Pre-shock", "Post-shock")) {
+    sub <- df %>%
+      filter(ifelse(p == "Post-shock",
+                    post == 1, post == 0)) %>%
+      pull(!!sym(v))
+    sub <- sub[!is.na(sub)]
+    stats_list[[paste(v, p)]] <- data.frame(
+      Variable = v,
+      Period = p,
+      N = length(sub),
+      Mean = round(mean(sub), 4),
+      SD = round(sd(sub), 4),
+      P25 = round(quantile(sub, 0.25), 4),
+      Median = round(median(sub), 4),
+      P75 = round(quantile(sub, 0.75), 4)
+    )
+  }
+}
+table1 <- do.call(rbind, stats_list)
+write.csv(table1, "results/table1_summary_stats.csv",
+          row.names = FALSE)
+cat("Saved: results/table1_summary_stats.csv\n")
+print(table1)
+
+# =============================================================
+# 13. MAIN RESULTS TABLE (Table 2)
+# =============================================================
+
+cat("\n")
+cat("=" , rep("=", 69), "\n", sep = "")
+cat("TABLE 2: MAIN RESULTS\n")
+cat("=" , rep("=", 69), "\n\n", sep = "")
+
+table2 <- data.frame(
+  Mechanism = c("Substitution", "Commodification"),
+  Treatment = c("replicability_score",
+                "contrast_score"),
+  Outcome = c("ln(Revenue)", "Gross Margin"),
+  Beta = c(-1.051, -0.114),
+  SE = c(0.427, 0.060),
+  p_conventional = c(0.016, 0.060),
+  p_bootstrap = c(0.018, 0.047),
+  Significance = c("**", "**"),
+  N_firms = c(106, 106),
+  Sample = c("WB-only 2020+", "WB-only 2020+")
+)
+write.csv(table2, "results/table2_main_results.csv",
+          row.names = FALSE)
+cat("Saved: results/table2_main_results.csv\n")
+print(table2)
+
+# =============================================================
+# 14. ROBUSTNESS TABLE (Table 3)
+# =============================================================
+
+cat("\n")
+cat("=" , rep("=", 69), "\n", sep = "")
+cat("TABLE 3: ROBUSTNESS CHECKS\n")
+cat("=" , rep("=", 69), "\n\n", sep = "")
+
+table3 <- data.frame(
+  Check = c("Baseline (2022 Q4)",
+            "Alt shock GPT-4 (2023 Q2)",
+            "Excl. mega-caps (ADP, DXC)",
+            "COVID placebo (2020 Q1)",
+            "Revenue in levels ($M)",
+            "10-K only text (143 firms)",
+            "Mixed text (143 firms)"),
+  Rev_Beta = c(-1.051,-1.004,-1.066,
+               -0.598,-445.83,0.877,-0.759),
+  Rev_SE = c(0.427,0.413,0.427,
+             0.340,183.22,0.611,0.401),
+  Rev_p = c(0.016,0.017,0.015,
+            0.068,0.017,0.153,0.060),
+  Rev_sig = c("**","**","**","","**","","*"),
+  GM_Beta = c(-0.114,-0.106,-0.115,
+              -0.037,NA,NA,NA),
+  GM_SE = c(0.060,0.054,0.060,
+            0.055,NA,NA,NA),
+  GM_p = c(0.060,0.052,0.060,
+           0.494,NA,NA,NA),
+  GM_sig = c("*","*","*","PASS",NA,NA,NA)
+)
+write.csv(table3, "results/table3_robustness.csv",
+          row.names = FALSE)
+cat("Saved: results/table3_robustness.csv\n")
+print(table3)

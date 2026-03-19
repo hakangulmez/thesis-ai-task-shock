@@ -1,0 +1,3 @@
+"Mechanism","Treatment","Outcome","Beta","SE","p_conventional","p_bootstrap","Significance","N_firms","Sample"
+"Substitution","replicability_score","ln(Revenue)",-1.051,0.427,0.016,0.018,"**",106,"WB-only 2020+"
+"Commodification","contrast_score","Gross Margin",-0.114,0.06,0.06,0.047,"**",106,"WB-only 2020+"

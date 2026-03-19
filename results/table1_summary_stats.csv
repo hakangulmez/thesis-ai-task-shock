@@ -1,0 +1,11 @@
+"Variable","Period","N","Mean","SD","P25","Median","P75"
+"revenue","Pre-shock",2982,927082350.1952,4804265234.6633,60085000,150994000,415216000
+"revenue","Post-shock",0,NA,NA,NA,NA,NA
+"gross_margin","Pre-shock",2578,0.6442,0.2174,0.5409,0.701,0.7803
+"gross_margin","Post-shock",0,NA,NA,NA,NA,NA
+"operating_margin","Pre-shock",2926,-0.1425,0.8351,-0.2042,-0.0148,0.1207
+"operating_margin","Post-shock",0,NA,NA,NA,NA,NA
+"rd_intensity","Pre-shock",2514,0.2336,0.1414,0.1441,0.216,0.2906
+"rd_intensity","Post-shock",0,NA,NA,NA,NA,NA
+"sga_intensity","Pre-shock",2786,0.2518,0.4652,0.1154,0.1699,0.2537
+"sga_intensity","Post-shock",0,NA,NA,NA,NA,NA
