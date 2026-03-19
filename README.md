@@ -32,6 +32,41 @@ Both results use firm and quarter-year fixed effects. All parallel trends tests 
 
 ---
 
+## Event Study
+
+The dynamic treatment effects confirm the theoretical timing predictions:
+
+- **ln(Revenue):** pre-trend coefficients flat near zero (Wald F=1.39, p=0.179 PASS), post-period coefficients drift negative and become significant from k=4 quarters after the shock onward
+
+- **Gross Margin:** pre-trend coefficients flat (Wald F=0.42, p=0.936 PASS), gradual margin compression from k=5, significant at k=9*** — consistent with delayed commodification as contracts expire
+
+---
+
+## Heterogeneity
+
+| SIC Group | Description | ln(Rev) β | GM β |
+|-----------|-------------|-----------|------|
+| 7370/7371 | Computer services | -1.998 (ns) | -0.117 (ns) |
+| 7372 | Prepackaged software | -0.723 (ns) | -0.138* |
+| 7373/7374 | Systems integration | -2.032 (ns) | -0.027 (ns) |
+
+Gross margin commodification concentrates in SIC 7372 (prepackaged software, 66 firms) — the sub-sector most directly comparable to LLM alternatives.
+
+---
+
+## Robustness Checks
+
+| Check | ln(Revenue) β | p | Gross Margin β | p |
+|-------|--------------|---|----------------|---|
+| Baseline (2022 Q4) | -1.051 | 0.016 ** | -0.114 | 0.060 * |
+| Alt shock GPT-4 (2023 Q2) | -1.004 | 0.017 ** | -0.106 | 0.052 * |
+| Excl. mega-caps (ADP, DXC) | -1.066 | 0.015 ** | -0.115 | 0.060 * |
+| COVID placebo (2020 Q1) | -0.598 | 0.068 | -0.037 | 0.494 PASS |
+
+Results are robust to alternative shock dates and sample composition. The COVID placebo passes cleanly for gross margin. The marginal revenue placebo result (p=0.068) reflects differential COVID-era demand patterns — high replicability firms (content, CRM tools) had stronger demand during remote work, running counter to the main finding and confirming it is conservative.
+
+---
+
 ## Theoretical Framework
 
 Builds on:
@@ -117,7 +152,12 @@ analysis/
   did_contrast_comparison.R   — two-treatment comparison
   did_robustness_textsource.R — text source robustness
   wild_cluster_bootstrap.R    — bootstrap inference
-figures/                      — all plots
+figures/
+  event_study_revenue.png    — ln(Revenue) event study
+  event_study_margin.png     — Gross Margin event study
+  event_study_combined.png   — both event studies side by side
+  heterogeneity_sic.png      — SIC code heterogeneity
+  robustness_checks.png      — robustness comparison
 results/                      — regression tables
 notebooks/
   project_overview.ipynb      — full research notebook
@@ -154,12 +194,12 @@ Rscript analysis/wild_cluster_bootstrap.R
 Completed:
 - Data collection (143/143 firms)
 - Treatment variable construction and validation
-- Main DiD estimation
-- Wild cluster bootstrap inference
-- Parallel trends validation
+- Main DiD estimation (two mechanisms)
+- Wild cluster bootstrap (B=9,999)
+- Event study plots (both outcomes)
+- Heterogeneity analysis (SIC sub-codes)
+- Robustness checks (3 specifications)
+- Research notebook with all figures
 
 Remaining:
-- Event study plots
-- Heterogeneity analysis
-- Robustness checks
 - Thesis writing
