@@ -30,6 +30,11 @@ Sample: 106 Wayback-only firms, 2020-2025
 
 Both results use firm and quarter-year fixed effects. All parallel trends tests pass.
 
+**Economic Magnitude**
+In revenue levels, a one standard deviation increase in task replicability (0.068) is associated with $30.3 million lower quarterly revenue growth — representing a 7.8% revenue differential relative to the sample mean of $388 million per quarter.
+
+High replicability firms (top quartile) grew revenue 31.8% post-shock versus 46.8% for low replicability firms (bottom quartile) — a gap of 15 percentage points. Both groups grew in absolute terms; the finding is differential growth, not absolute decline.
+
 ---
 
 ## Event Study

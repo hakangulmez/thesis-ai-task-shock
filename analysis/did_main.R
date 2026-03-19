@@ -87,6 +87,171 @@ msummary(models,
 )
 cat("\nRegression table saved to results/did_main_table.txt\n")
 
+# --- 2b. Revenue in levels (millions USD) ----------------------------------
+
+df_wb3 <- df %>%
+  filter(fiscal_year >= 2020,
+         text_source == "wayback") %>%
+  mutate(revenue_m = revenue / 1e6)
+
+m_rev_levels <- feols(
+  revenue_m ~ post_x_replicability |
+    ticker + year_quarter,
+  data = df_wb3, cluster = ~ticker
+)
+
+cat("\n=== REVENUE IN LEVELS (millions USD) ===\n")
+b <- coef(m_rev_levels)["post_x_replicability"]
+se <- summary(m_rev_levels)$se["post_x_replicability"]
+p <- pvalue(m_rev_levels)["post_x_replicability"]
+cat(sprintf("Beta: %.2f  SE: %.2f  p: %.4f\n", b, se, p))
+
+mean_rev <- mean(df_wb3$revenue_m, na.rm = TRUE)
+cat(sprintf("Mean quarterly revenue: $%.1fM\n", mean_rev))
+cat(sprintf("Effect at 1 SD replicability (0.068): $%.1fM per quarter\n",
+            b * 0.068))
+cat(sprintf("As pct of mean revenue: %.1f%%\n",
+            (b * 0.068 / mean_rev) * 100))
+
+df_wb3$rep_quartile <- ntile(df_wb3$replicability_score, 4)
+
+rev_by_group <- df_wb3 %>%
+  filter(rep_quartile %in% c(1, 4)) %>%
+  mutate(group = ifelse(rep_quartile == 4,
+                        "High Rep (Q4)",
+                        "Low Rep (Q1)"),
+         period = ifelse(post == 1,
+                         "Post-shock",
+                         "Pre-shock")) %>%
+  group_by(group, period) %>%
+  summarise(
+    mean_rev_m = mean(revenue_m, na.rm = TRUE),
+    n_obs = n(),
+    .groups = "drop"
+  )
+
+cat("\nMean quarterly revenue by group (millions USD):\n")
+print(as.data.frame(rev_by_group))
+
+# Revenue growth comparison figure
+rev_growth <- df_wb3 %>%
+  filter(rep_quartile %in% c(1,4)) %>%
+  mutate(
+    group = ifelse(rep_quartile == 4,
+                   "High Replicability (Q4)",
+                   "Low Replicability (Q1)"),
+    period = ifelse(post == 1,
+                    "Post-shock\n(2023 Q1+)",
+                    "Pre-shock\n(2020-2022)")
+  ) %>%
+  group_by(group, period) %>%
+  summarise(
+    mean_rev = mean(revenue_m, na.rm=TRUE),
+    se_rev = sd(revenue_m, na.rm=TRUE) / sqrt(n()),
+    .groups = "drop"
+  )
+
+p_levels <- ggplot(rev_growth,
+    aes(x = period, y = mean_rev,
+        fill = group)) +
+  geom_bar(stat = "identity",
+           position = position_dodge(0.7),
+           width = 0.6, alpha = 0.85) +
+  geom_errorbar(
+    aes(ymin = mean_rev - 1.96*se_rev,
+        ymax = mean_rev + 1.96*se_rev),
+    position = position_dodge(0.7),
+    width = 0.2, linewidth = 0.6) +
+  scale_fill_manual(values = c(
+    "High Replicability (Q4)" = "#E63946",
+    "Low Replicability (Q1)" = "#457B9D")) +
+  labs(
+    title = "Mean Quarterly Revenue by Replicability Quartile",
+    subtitle = paste0(
+      "DiD: beta=-$445.8M (SE=183.2, p=0.017**) | ",
+      "1 SD increase = -$30.3M per quarter (-7.8%)"),
+    x = "",
+    y = "Mean Quarterly Revenue ($M)",
+    fill = "Replicability Group",
+    caption = paste0(
+      "Wayback-only (106 firms), 2020+ | ",
+      "Error bars = 95% CI | ",
+      "Both groups grew — finding is differential growth")
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 9,
+                                  color = "gray40"),
+    legend.position = "top",
+    plot.caption = element_text(color = "gray50",
+                                 size = 8)
+  )
+
+ggsave("figures/revenue_levels.png",
+       p_levels, width = 10, height = 6, dpi = 150)
+cat("Saved: figures/revenue_levels.png\n")
+
+# Quarterly revenue trend by group
+rev_trend <- df_wb3 %>%
+  filter(rep_quartile %in% c(1,4)) %>%
+  mutate(
+    group = ifelse(rep_quartile == 4,
+                   "High Replicability (Q4)",
+                   "Low Replicability (Q1)"),
+    yq_num = fiscal_year +
+             (fiscal_quarter - 1) / 4
+  ) %>%
+  group_by(group, yq_num,
+           fiscal_year, fiscal_quarter) %>%
+  summarise(
+    mean_rev = mean(revenue_m, na.rm=TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(year_quarter = paste0(
+    fiscal_year, " Q", fiscal_quarter))
+
+p_trend <- ggplot(rev_trend,
+    aes(x = yq_num, y = mean_rev,
+        color = group, group = group)) +
+  annotate("rect",
+           xmin = 2022.75, xmax = Inf,
+           ymin = -Inf, ymax = Inf,
+           fill = "gray90", alpha = 0.4) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1.5) +
+  geom_vline(xintercept = 2022.75,
+             linetype = "dashed",
+             color = "black",
+             linewidth = 0.7) +
+  scale_color_manual(values = c(
+    "High Replicability (Q4)" = "#E63946",
+    "Low Replicability (Q1)" = "#457B9D")) +
+  annotate("text", x = 2022.85,
+           y = max(rev_trend$mean_rev) * 0.95,
+           label = "ChatGPT\nLaunch",
+           size = 3, hjust = 0,
+           color = "gray30") +
+  labs(
+    title = "Quarterly Revenue Trend: High vs Low Replicability",
+    subtitle = "Top and bottom quartile by replicability score",
+    x = "Quarter",
+    y = "Mean Quarterly Revenue ($M)",
+    color = "Group",
+    caption = "Wayback-only (106 firms) | Gray = post-shock period"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "top",
+    plot.caption = element_text(
+      color = "gray50", size = 8)
+  )
+
+ggsave("figures/revenue_trend_by_group.png",
+       p_trend, width = 12, height = 6, dpi = 150)
+cat("Saved: figures/revenue_trend_by_group.png\n")
+
 # --- 3. Event study -----------------------------------------------------
 
 cat("\n")

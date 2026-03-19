@@ -64,6 +64,13 @@ Mechanism 2 — Commodification (contrast_score treatment):
   All firms:    Gross Margin β=-0.076*, SE=0.042, p=0.069
   Wayback-only: Gross Margin β=-0.114*, SE=0.060, p=0.060
 
+## Revenue in Levels
+Revenue (millions USD): beta=-445.83**
+(SE=183.22, p=0.017)
+1 SD increase = -$30.3M per quarter (-7.8%)
+High rep (Q4): +31.8% growth vs
+Low rep (Q1): +46.8% growth — 15pp gap
+
 ## Parallel trends — ALL PASS on trimmed 2020+ sample
 
 high_score:
@@ -159,7 +166,7 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Wayback-only subsample strengthens both results
 [x] Wild cluster bootstrap inference complete
     Result 1: p=0.018** | Result 2: p=0.047**
-[ ] Event study plots finalized
-[ ] Heterogeneity analysis complete
-[ ] Robustness checks complete
+[x] Event study plots finalized
+[x] Heterogeneity analysis complete
+[x] Robustness checks complete (3/3)
 [ ] Thesis written
