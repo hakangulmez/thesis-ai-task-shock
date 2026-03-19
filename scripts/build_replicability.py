@@ -43,6 +43,19 @@ ANCHOR_SENTENCES = [
     "Process and reconcile transactions automatically",
 ]
 
+LOW_ANCHOR_SENTENCES = [
+    "Monitor real-time network traffic across distributed infrastructure",
+    "Detect and respond to security incidents across enterprise systems",
+    "Orchestrate complex multi-system workflows requiring live data integration",
+    "Process high-frequency financial transactions with sub-millisecond latency",
+    "Ingest and correlate telemetry data from cloud infrastructure in real time",
+    "Coordinate incident response across hundreds of enterprise integrations",
+    "Perform chip design verification across hardware simulation environments",
+    "Manage physical supply chain routing across logistics networks",
+    "Execute database query optimization across distributed storage systems",
+    "Provision and manage cloud infrastructure resources programmatically",
+]
+
 TOP_K = 10  # number of top sentences to average
 MIN_WORDS = 10  # minimum words per sentence
 
@@ -93,7 +106,8 @@ def main():
     model = SentenceTransformer("all-MiniLM-L6-v2")
 
     print("Encoding anchor sentences...")
-    anchor_embeddings = model.encode(ANCHOR_SENTENCES, normalize_embeddings=True)
+    high_embeddings = model.encode(ANCHOR_SENTENCES, normalize_embeddings=True)
+    low_embeddings = model.encode(LOW_ANCHOR_SENTENCES, normalize_embeddings=True)
 
     universe = load_universe()
     print("Firms in universe: %d" % len(universe))
@@ -116,6 +130,9 @@ def main():
                 "ticker": ticker,
                 "company_name": universe[ticker],
                 "replicability_score": np.nan,
+                "high_score": np.nan,
+                "low_score": np.nan,
+                "contrast_score": np.nan,
                 "sentence_count": 0,
                 "text_source": source,
                 "top_sentences": "",
@@ -125,27 +142,35 @@ def main():
         # Encode firm sentences
         sent_embeddings = model.encode(sentences, normalize_embeddings=True)
 
-        # Cosine similarity: (n_sentences, n_anchors)
-        # Embeddings are already normalized, so dot product = cosine sim
-        sim_matrix = sent_embeddings @ anchor_embeddings.T
+        # High-replicability similarity
+        sim_high = sent_embeddings @ high_embeddings.T
+        max_sim_high = sim_high.max(axis=1)
+        k = min(TOP_K, len(max_sim_high))
+        top_idx_high = np.argsort(max_sim_high)[::-1][:k]
+        high_score = float(np.mean(max_sim_high[top_idx_high]))
 
-        # Max similarity per sentence across all anchors
-        max_sim_per_sentence = sim_matrix.max(axis=1)
+        # Low-replicability similarity
+        sim_low = sent_embeddings @ low_embeddings.T
+        max_sim_low = sim_low.max(axis=1)
+        k_low = min(TOP_K, len(max_sim_low))
+        top_idx_low = np.argsort(max_sim_low)[::-1][:k_low]
+        low_score = float(np.mean(max_sim_low[top_idx_low]))
 
-        # Top-K sentence scores
-        k = min(TOP_K, len(max_sim_per_sentence))
-        top_indices = np.argsort(max_sim_per_sentence)[::-1][:k]
-        score = float(np.mean(max_sim_per_sentence[top_indices]))
+        # Contrast score
+        contrast_score = high_score - low_score
 
-        # Top 3 sentences for validation
-        top3_indices = top_indices[:3]
+        # Top 3 sentences (from high anchors) for validation
+        top3_indices = top_idx_high[:3]
         top3_sentences = [sentences[i] for i in top3_indices]
         top3_str = " | ".join(top3_sentences)
 
         results.append({
             "ticker": ticker,
             "company_name": universe[ticker],
-            "replicability_score": round(score, 4),
+            "replicability_score": round(high_score, 4),
+            "high_score": round(high_score, 4),
+            "low_score": round(low_score, 4),
+            "contrast_score": round(contrast_score, 4),
             "sentence_count": len(sentences),
             "text_source": source,
             "top_sentences": top3_str,
@@ -162,25 +187,40 @@ def main():
 
     # --- Summary statistics ---
     scored = df.dropna(subset=["replicability_score"])
-    scores = scored["replicability_score"]
+
+    for col, label in [("high_score", "HIGH SCORE (replicable anchors)"),
+                       ("low_score", "LOW SCORE (non-replicable anchors)"),
+                       ("contrast_score", "CONTRAST SCORE (high - low)")]:
+        vals = scored[col]
+        print("\n" + "=" * 60)
+        print("%s DISTRIBUTION (n=%d)" % (label, len(vals)))
+        print("  Min:  %.4f" % vals.min())
+        print("  P25:  %.4f" % vals.quantile(0.25))
+        print("  P50:  %.4f" % vals.quantile(0.50))
+        print("  P75:  %.4f" % vals.quantile(0.75))
+        print("  Max:  %.4f" % vals.max())
+        print("  Mean: %.4f  SD: %.4f" % (vals.mean(), vals.std()))
 
     print("\n" + "=" * 60)
-    print("SCORE DISTRIBUTION (n=%d)" % len(scores))
-    print("  Min:  %.4f" % scores.min())
-    print("  P25:  %.4f" % scores.quantile(0.25))
-    print("  P50:  %.4f" % scores.quantile(0.50))
-    print("  P75:  %.4f" % scores.quantile(0.75))
-    print("  Max:  %.4f" % scores.max())
-
-    print("\nTOP 10 HIGHEST (most replicable):")
-    top10 = scored.nlargest(10, "replicability_score")
+    print("TOP 10 BY CONTRAST SCORE (most replicable relative to infra):")
+    top10 = scored.nlargest(10, "contrast_score")
     for _, row in top10.iterrows():
-        print("  %-6s  %.4f  %s" % (row["ticker"], row["replicability_score"], row["company_name"]))
+        print("  %-6s  contrast=%.4f  high=%.4f  low=%.4f  %s" % (
+            row["ticker"], row["contrast_score"], row["high_score"],
+            row["low_score"], row["company_name"]))
 
-    print("\nBOTTOM 10 LOWEST (least replicable):")
-    bot10 = scored.nsmallest(10, "replicability_score")
+    print("\nBOTTOM 10 BY CONTRAST SCORE (least replicable relative to infra):")
+    bot10 = scored.nsmallest(10, "contrast_score")
     for _, row in bot10.iterrows():
-        print("  %-6s  %.4f  %s" % (row["ticker"], row["replicability_score"], row["company_name"]))
+        print("  %-6s  contrast=%.4f  high=%.4f  low=%.4f  %s" % (
+            row["ticker"], row["contrast_score"], row["high_score"],
+            row["low_score"], row["company_name"]))
+
+    # Correlation
+    corr = scored["high_score"].corr(scored["contrast_score"])
+    print("\nCorrelation(high_score, contrast_score): %.4f" % corr)
+    corr_hl = scored["high_score"].corr(scored["low_score"])
+    print("Correlation(high_score, low_score):      %.4f" % corr_hl)
 
     # Source breakdown
     print("\nTEXT SOURCE BREAKDOWN:")

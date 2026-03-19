@@ -22,15 +22,17 @@ def main():
     print("Replicability scores: %d firms" % len(rep))
 
     # Merge replicability onto financial panel
-    rep_cols = rep[["ticker", "replicability_score", "text_source"]].copy()
+    rep_cols = rep[["ticker", "replicability_score", "high_score", "low_score",
+                    "contrast_score", "text_source"]].copy()
     panel = fin.merge(rep_cols, on="ticker", how="left")
 
     # Post indicator: 1 if >= 2022 Q4 (ChatGPT launched Nov 30, 2022)
     panel["post"] = ((panel["fiscal_year"] > 2022) |
                      ((panel["fiscal_year"] == 2022) & (panel["fiscal_quarter"] >= 4))).astype(int)
 
-    # Interaction term
+    # Interaction terms
     panel["post_x_replicability"] = panel["post"] * panel["replicability_score"]
+    panel["post_x_contrast"] = panel["post"] * panel["contrast_score"]
 
     # Log revenue (where revenue > 0)
     panel["ln_revenue"] = np.where(
