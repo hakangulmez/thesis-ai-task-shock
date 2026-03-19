@@ -169,4 +169,4 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Event study plots finalized
 [x] Heterogeneity analysis complete
 [x] Robustness checks complete (3/3)
-[ ] Thesis written
+[x] Thesis written
