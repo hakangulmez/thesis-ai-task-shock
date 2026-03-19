@@ -157,7 +157,8 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] DiD estimated — contrast_score: GM β=-0.076*, p=0.069
 [x] Parallel trends tested (all pass, both treatments)
 [x] Wayback-only subsample strengthens both results
-[ ] Wild cluster bootstrap inference
+[x] Wild cluster bootstrap inference complete
+    Result 1: p=0.018** | Result 2: p=0.047**
 [ ] Event study plots finalized
 [ ] Heterogeneity analysis complete
 [ ] Robustness checks complete
