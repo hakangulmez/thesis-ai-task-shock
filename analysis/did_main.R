@@ -404,4 +404,396 @@ for (label in c("ln(Revenue)", "Gross Margin", "Operating Margin")) {
   }
 }
 
+# =============================================================
+# 9. EVENT STUDY — WAYBACK-ONLY, 2020+ (PREFERRED SPEC)
+# =============================================================
+
+cat("\n")
+cat("=" , rep("=", 69), "\n", sep = "")
+cat("EVENT STUDY — WAYBACK-ONLY, 2020+ (PREFERRED SPECIFICATION)\n")
+cat("=" , rep("=", 69), "\n\n", sep = "")
+
+df_wb <- df %>%
+  filter(fiscal_year >= 2020, text_source == "wayback")
+
+cat("Wayback-only 2020+ panel:", nrow(df_wb), "rows,",
+    n_distinct(df_wb$ticker), "firms\n")
+cat("Quarter relative range:", min(df_wb$quarter_relative),
+    "to", max(df_wb$quarter_relative), "\n\n")
+
+# --- Event study A: ln_revenue x replicability_score ---
+es_rev <- feols(
+  ln_revenue ~ i(quarter_relative, replicability_score, ref = -1) |
+    ticker + year_quarter,
+  data = df_wb, cluster = ~ticker
+)
+
+# --- Event study B: gross_margin x contrast_score ---
+es_gm <- feols(
+  gross_margin ~ i(quarter_relative, contrast_score, ref = -1) |
+    ticker + year_quarter,
+  data = df_wb, cluster = ~ticker
+)
+
+# --- Extract coefficients ---
+extract_es2 <- function(model, outcome_label, treatment_label) {
+  ct <- coeftable(model)
+  idx <- grepl("quarter_relative", rownames(ct))
+  ct_sub <- ct[idx, , drop = FALSE]
+  qr <- as.numeric(gsub("quarter_relative::([-0-9]+):.*", "\\1", rownames(ct_sub)))
+  pvals <- ct_sub[, "Pr(>|t|)"]
+
+  out <- data.frame(
+    quarter_relative = qr,
+    estimate         = ct_sub[, "Estimate"],
+    se               = ct_sub[, "Std. Error"],
+    ci_lower         = ct_sub[, "Estimate"] - 1.96 * ct_sub[, "Std. Error"],
+    ci_upper         = ct_sub[, "Estimate"] + 1.96 * ct_sub[, "Std. Error"],
+    pvalue           = pvals,
+    outcome          = outcome_label,
+    treatment        = treatment_label,
+    stringsAsFactors = FALSE
+  )
+  # Add reference point
+  ref_row <- data.frame(
+    quarter_relative = -1, estimate = 0, se = 0,
+    ci_lower = 0, ci_upper = 0, pvalue = NA,
+    outcome = outcome_label, treatment = treatment_label,
+    stringsAsFactors = FALSE
+  )
+  rbind(out, ref_row)
+}
+
+es_rev_df <- extract_es2(es_rev, "ln(Revenue)", "replicability_score")
+es_gm_df  <- extract_es2(es_gm,  "Gross Margin", "contrast_score")
+
+# --- Print coefficients ---
+cat("Event Study A: ln(Revenue) x replicability_score\n")
+cat(sprintf("%-5s %10s %10s %10s %10s\n", "k", "Beta", "SE", "95% CI", "p"))
+cat(strrep("-", 55), "\n")
+for (i in order(es_rev_df$quarter_relative)) {
+  r <- es_rev_df[i, ]
+  cat(sprintf("%4d  %9.4f %9.4f  [%6.3f, %6.3f]  %s\n",
+    r$quarter_relative, r$estimate, r$se, r$ci_lower, r$ci_upper,
+    ifelse(is.na(r$pvalue), "ref", sprintf("%.4f", r$pvalue))))
+}
+
+cat("\nEvent Study B: Gross Margin x contrast_score\n")
+cat(sprintf("%-5s %10s %10s %10s %10s\n", "k", "Beta", "SE", "95% CI", "p"))
+cat(strrep("-", 55), "\n")
+for (i in order(es_gm_df$quarter_relative)) {
+  r <- es_gm_df[i, ]
+  cat(sprintf("%4d  %9.4f %9.4f  [%6.3f, %6.3f]  %s\n",
+    r$quarter_relative, r$estimate, r$se, r$ci_lower, r$ci_upper,
+    ifelse(is.na(r$pvalue), "ref", sprintf("%.4f", r$pvalue))))
+}
+
+# --- Plot A: ln(Revenue) event study ---
+es_rev_df <- es_rev_df[order(es_rev_df$quarter_relative), ]
+es_rev_df$period <- ifelse(es_rev_df$quarter_relative < 0, "pre", "post")
+es_rev_df$sig_post <- ifelse(
+  es_rev_df$period == "post" & !is.na(es_rev_df$pvalue) & es_rev_df$pvalue < 0.05,
+  "sig", "ns"
+)
+
+p_rev <- ggplot(es_rev_df, aes(x = quarter_relative, y = estimate)) +
+  annotate("rect", xmin = -Inf, xmax = -0.5, ymin = -Inf, ymax = Inf,
+           fill = "gray90", alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.5) +
+  geom_vline(xintercept = -0.5, color = "black", linewidth = 0.7) +
+  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.15, fill = "steelblue") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2, color = "steelblue", alpha = 0.6) +
+  geom_point(aes(color = sig_post), size = 2.5) +
+  geom_line(color = "steelblue", linewidth = 0.4) +
+  scale_color_manual(values = c("ns" = "steelblue", "sig" = "red"), guide = "none") +
+  labs(
+    title    = "Event Study: ln(Revenue) × Replicability Score",
+    subtitle = "Wayback-only sample (106 firms), 2020+, ref = k=-1 (2022 Q3)",
+    x        = "Quarters Relative to ChatGPT Launch (2022 Q4)",
+    y        = "Coefficient (Post × Replicability)",
+    caption  = "Firm + Quarter FE, clustered SE | Red = significant at 5%"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        plot.caption = element_text(color = "gray50", size = 8))
+
+ggsave("figures/event_study_revenue.png", p_rev, width = 10, height = 6, dpi = 150)
+cat("\nSaved: figures/event_study_revenue.png\n")
+
+# --- Plot B: Gross Margin event study ---
+es_gm_df <- es_gm_df[order(es_gm_df$quarter_relative), ]
+es_gm_df$period <- ifelse(es_gm_df$quarter_relative < 0, "pre", "post")
+es_gm_df$sig_post <- ifelse(
+  es_gm_df$period == "post" & !is.na(es_gm_df$pvalue) & es_gm_df$pvalue < 0.05,
+  "sig", "ns"
+)
+
+p_gm2 <- ggplot(es_gm_df, aes(x = quarter_relative, y = estimate)) +
+  annotate("rect", xmin = -Inf, xmax = -0.5, ymin = -Inf, ymax = Inf,
+           fill = "gray90", alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.5) +
+  geom_vline(xintercept = -0.5, color = "black", linewidth = 0.7) +
+  geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.15, fill = "#E67E22") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2, color = "#E67E22", alpha = 0.6) +
+  geom_point(aes(color = sig_post), size = 2.5) +
+  geom_line(color = "#E67E22", linewidth = 0.4) +
+  scale_color_manual(values = c("ns" = "#E67E22", "sig" = "red"), guide = "none") +
+  labs(
+    title    = "Event Study: Gross Margin × Contrast Score",
+    subtitle = "Wayback-only sample (106 firms), 2020+, ref = k=-1 (2022 Q3)",
+    x        = "Quarters Relative to ChatGPT Launch (2022 Q4)",
+    y        = "Coefficient (Post × Contrast)",
+    caption  = "Firm + Quarter FE, clustered SE | Red = significant at 5%"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        plot.caption = element_text(color = "gray50", size = 8))
+
+ggsave("figures/event_study_margin.png", p_gm2, width = 10, height = 6, dpi = 150)
+cat("Saved: figures/event_study_margin.png\n")
+
+# --- Pre-trend Wald tests (WB-only 2020+) ---
+cat("\n--- Parallel Trends Pre-Test (Wayback-only, 2020+) ---\n")
+
+for (info in list(
+  list("ln(Revenue)", es_rev),
+  list("Gross Margin", es_gm)
+)) {
+  label <- info[[1]]
+  es_model <- info[[2]]
+  ct <- coeftable(es_model)
+  rnames <- rownames(ct)[grepl("quarter_relative", rownames(ct))]
+  qr <- as.numeric(gsub("quarter_relative::([-0-9]+):.*", "\\1", rnames))
+  pre_qr <- qr[qr < -1]
+  if (length(pre_qr) > 0) {
+    pre_pattern <- paste0("quarter_relative::", pre_qr, ":", collapse = "|")
+    wt <- wald(es_model, keep = pre_pattern)
+    cat(sprintf("  %-20s F = %.3f, p = %.4f %s\n",
+      label, wt$stat, wt$p,
+      ifelse(wt$p > 0.10, "(PASS)", "(FAIL)")))
+  }
+}
+
+# =============================================================
+# 10. HETEROGENEITY BY SIC CODE
+# =============================================================
+
+cat("\n")
+cat("=" , rep("=", 69), "\n", sep = "")
+cat("HETEROGENEITY BY SIC CODE — WAYBACK-ONLY, 2020+\n")
+cat("=" , rep("=", 69), "\n\n", sep = "")
+
+# Merge SIC codes from universe
+universe <- read.csv("data/raw/firm_universe_v1.csv")
+sic_map <- universe[, c("ticker", "sic_code")]
+df_wb <- merge(df_wb, sic_map, by = "ticker", all.x = TRUE)
+
+# Create SIC groups
+df_wb$sic_group <- ifelse(df_wb$sic_code %in% c(7370, 7371), "7370/7371",
+                   ifelse(df_wb$sic_code == 7372, "7372",
+                   ifelse(df_wb$sic_code %in% c(7373, 7374), "7373/7374", "Other")))
+
+cat("SIC group distribution (firms):\n")
+sic_firm_counts <- tapply(df_wb$ticker, df_wb$sic_group, function(x) length(unique(x)))
+print(sic_firm_counts)
+cat("\n")
+
+# --- Mechanism 1: ln_revenue x replicability_score by SIC ---
+cat("MECHANISM 1: ln(Revenue) x replicability_score\n")
+cat(sprintf("%-12s %8s %10s %10s %10s %6s\n",
+    "SIC Group", "N firms", "Beta", "SE", "p-value", "Sig"))
+cat(strrep("-", 62), "\n")
+
+for (grp in c("7370/7371", "7372", "7373/7374")) {
+  sub <- df_wb[df_wb$sic_group == grp, ]
+  n_firms <- length(unique(sub$ticker))
+  m <- tryCatch(
+    feols(ln_revenue ~ post_x_replicability | ticker + year_quarter,
+          data = sub, cluster = ~ticker),
+    error = function(e) NULL
+  )
+  if (!is.null(m)) {
+    b <- coef(m)["post_x_replicability"]
+    se <- summary(m)$se["post_x_replicability"]
+    p <- pvalue(m)["post_x_replicability"]
+    sig <- ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.10, "*", "")))
+    cat(sprintf("%-12s %8d %10.4f %10.4f %10.4f %6s\n", grp, n_firms, b, se, p, sig))
+  } else {
+    cat(sprintf("%-12s %8d %10s\n", grp, n_firms, "FAILED"))
+  }
+}
+
+# --- Mechanism 2: gross_margin x contrast_score by SIC ---
+cat("\nMECHANISM 2: Gross Margin x contrast_score\n")
+cat(sprintf("%-12s %8s %10s %10s %10s %6s\n",
+    "SIC Group", "N firms", "Beta", "SE", "p-value", "Sig"))
+cat(strrep("-", 62), "\n")
+
+for (grp in c("7370/7371", "7372", "7373/7374")) {
+  sub <- df_wb[df_wb$sic_group == grp, ]
+  n_firms <- length(unique(sub$ticker))
+  m <- tryCatch(
+    feols(gross_margin ~ post_x_contrast | ticker + year_quarter,
+          data = sub, cluster = ~ticker),
+    error = function(e) NULL
+  )
+  if (!is.null(m)) {
+    b <- coef(m)["post_x_contrast"]
+    se <- summary(m)$se["post_x_contrast"]
+    p <- pvalue(m)["post_x_contrast"]
+    sig <- ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.10, "*", "")))
+    cat(sprintf("%-12s %8d %10.4f %10.4f %10.4f %6s\n", grp, n_firms, b, se, p, sig))
+  } else {
+    cat(sprintf("%-12s %8d %10s\n", grp, n_firms, "FAILED"))
+  }
+}
+
+# =============================================================
+# 11. ROBUSTNESS CHECKS
+# =============================================================
+
+cat("\n")
+cat("=" , rep("=", 69), "\n", sep = "")
+cat("ROBUSTNESS CHECKS — WAYBACK-ONLY, 2020+\n")
+cat("=" , rep("=", 69), "\n\n")
+
+# Recreate df_wb without SIC merge artifacts
+df_wb2 <- df %>%
+  filter(fiscal_year >= 2020, text_source == "wayback")
+
+# --- ROBUSTNESS 1: Alternative shock date (GPT-4, 2023 Q2) ---
+cat("--- ROBUSTNESS 1: Alternative Shock Date (GPT-4, 2023 Q2) ---\n\n")
+
+df_wb2$post_gpt4 <- as.integer(
+  (df_wb2$fiscal_year > 2023) |
+  (df_wb2$fiscal_year == 2023 & df_wb2$fiscal_quarter >= 2)
+)
+df_wb2$post_gpt4_x_rep <- df_wb2$post_gpt4 * df_wb2$replicability_score
+df_wb2$post_gpt4_x_con <- df_wb2$post_gpt4 * df_wb2$contrast_score
+
+r1_rev <- feols(ln_revenue ~ post_gpt4_x_rep | ticker + year_quarter,
+                data = df_wb2, cluster = ~ticker)
+r1_gm  <- feols(gross_margin ~ post_gpt4_x_con | ticker + year_quarter,
+                data = df_wb2, cluster = ~ticker)
+
+cat(sprintf("%-40s %10s %10s %10s %6s\n",
+    "Specification", "Beta", "SE", "p-value", "Sig"))
+cat(strrep("-", 80), "\n")
+
+# Original results for comparison
+orig_rev <- feols(ln_revenue ~ post_x_replicability | ticker + year_quarter,
+                  data = df_wb2, cluster = ~ticker)
+orig_gm  <- feols(gross_margin ~ post_x_contrast | ticker + year_quarter,
+                  data = df_wb2, cluster = ~ticker)
+
+print_row <- function(label, model, varname) {
+  b <- coef(model)[varname]
+  se <- summary(model)$se[varname]
+  p <- pvalue(model)[varname]
+  sig <- ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.10, "*", "")))
+  cat(sprintf("%-40s %10.4f %10.4f %10.4f %6s\n", label, b, se, p, sig))
+}
+
+print_row("ln(Rev): Original (2022 Q4)", orig_rev, "post_x_replicability")
+print_row("ln(Rev): GPT-4 date (2023 Q2)", r1_rev, "post_gpt4_x_rep")
+print_row("Gross Margin: Original (2022 Q4)", orig_gm, "post_x_contrast")
+print_row("Gross Margin: GPT-4 date (2023 Q2)", r1_gm, "post_gpt4_x_con")
+
+# --- ROBUSTNESS 2: COVID placebo test ---
+cat("\n--- ROBUSTNESS 2: COVID Placebo Test (fake shock at 2020 Q1) ---\n\n")
+
+# Restrict to pre-shock data only (fiscal_year <= 2022, quarter < Q4 if 2022)
+df_placebo <- df %>%
+  filter(text_source == "wayback",
+         fiscal_year >= 2020,
+         (fiscal_year < 2022) | (fiscal_year == 2022 & fiscal_quarter <= 3))
+
+# Placebo post: 1 if >= 2021 Q1 (so 2020 is all pre, 2021-2022Q3 is post)
+df_placebo$post_placebo <- as.integer(df_placebo$fiscal_year >= 2021)
+df_placebo$placebo_x_rep <- df_placebo$post_placebo * df_placebo$replicability_score
+df_placebo$placebo_x_con <- df_placebo$post_placebo * df_placebo$contrast_score
+
+cat("Placebo sample:", nrow(df_placebo), "rows,",
+    n_distinct(df_placebo$ticker), "firms\n")
+cat("Pre (2020): ", sum(df_placebo$post_placebo == 0), "rows\n")
+cat("Post (2021-2022Q3):", sum(df_placebo$post_placebo == 1), "rows\n\n")
+
+r2_rev <- feols(ln_revenue ~ placebo_x_rep | ticker + year_quarter,
+                data = df_placebo, cluster = ~ticker)
+r2_gm  <- feols(gross_margin ~ placebo_x_con | ticker + year_quarter,
+                data = df_placebo, cluster = ~ticker)
+
+cat(sprintf("%-40s %10s %10s %10s %6s %8s\n",
+    "Specification", "Beta", "SE", "p-value", "Sig", "Result"))
+cat(strrep("-", 86), "\n")
+
+for (info in list(
+  list("ln(Rev): Placebo (2020 Q1)", r2_rev, "placebo_x_rep"),
+  list("Gross Margin: Placebo (2020 Q1)", r2_gm, "placebo_x_con")
+)) {
+  b <- coef(info[[2]])[info[[3]]]
+  se <- summary(info[[2]])$se[info[[3]]]
+  p <- pvalue(info[[2]])[info[[3]]]
+  sig <- ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.10, "*", "")))
+  result <- ifelse(p > 0.10, "PASS", "FAIL")
+  cat(sprintf("%-40s %10.4f %10.4f %10.4f %6s %8s\n", info[[1]], b, se, p, sig, result))
+}
+cat("PASS = null result (p > 0.10) — no pre-existing differential trends\n")
+
+# --- ROBUSTNESS 3: Exclude mega-caps ---
+cat("\n--- ROBUSTNESS 3: Exclude Mega-Caps (ADP, DXC) ---\n\n")
+
+df_nomega <- df_wb2 %>%
+  filter(!(ticker %in% c("ADP", "DXC")))
+
+cat("Sample without mega-caps:", nrow(df_nomega), "rows,",
+    n_distinct(df_nomega$ticker), "firms\n\n")
+
+r3_rev <- feols(ln_revenue ~ post_x_replicability | ticker + year_quarter,
+                data = df_nomega, cluster = ~ticker)
+r3_gm  <- feols(gross_margin ~ post_x_contrast | ticker + year_quarter,
+                data = df_nomega, cluster = ~ticker)
+
+cat(sprintf("%-40s %10s %10s %10s %6s\n",
+    "Specification", "Beta", "SE", "p-value", "Sig"))
+cat(strrep("-", 80), "\n")
+print_row("ln(Rev): Original (106 firms)", orig_rev, "post_x_replicability")
+print_row("ln(Rev): Excl. mega-caps (104 firms)", r3_rev, "post_x_replicability")
+print_row("Gross Margin: Original (106 firms)", orig_gm, "post_x_contrast")
+print_row("Gross Margin: Excl. mega-caps (104)", r3_gm, "post_x_contrast")
+
+# =============================================================
+# COMPREHENSIVE ROBUSTNESS SUMMARY
+# =============================================================
+cat("\n\n")
+cat("=" , rep("=", 79), "\n", sep = "")
+cat("COMPREHENSIVE ROBUSTNESS SUMMARY\n")
+cat("=" , rep("=", 79), "\n\n", sep = "")
+
+cat(sprintf("%-35s %-14s %8s %8s %8s %5s\n",
+    "Check", "Outcome", "Beta", "SE", "p", "Sig"))
+cat(strrep("-", 80), "\n")
+
+summary_row <- function(label, outcome, model, varname) {
+  b <- coef(model)[varname]
+  se <- summary(model)$se[varname]
+  p <- pvalue(model)[varname]
+  sig <- ifelse(p < 0.01, "***", ifelse(p < 0.05, "**", ifelse(p < 0.10, "*", "")))
+  cat(sprintf("%-35s %-14s %8.4f %8.4f %8.4f %5s\n", label, outcome, b, se, p, sig))
+}
+
+summary_row("Baseline (2022 Q4)", "ln(Revenue)", orig_rev, "post_x_replicability")
+summary_row("Alt shock (GPT-4, 2023 Q2)", "ln(Revenue)", r1_rev, "post_gpt4_x_rep")
+summary_row("Placebo (2020 Q1)", "ln(Revenue)", r2_rev, "placebo_x_rep")
+summary_row("Excl. mega-caps", "ln(Revenue)", r3_rev, "post_x_replicability")
+cat(strrep("-", 80), "\n")
+summary_row("Baseline (2022 Q4)", "Gross Margin", orig_gm, "post_x_contrast")
+summary_row("Alt shock (GPT-4, 2023 Q2)", "Gross Margin", r1_gm, "post_gpt4_x_con")
+summary_row("Placebo (2020 Q1)", "Gross Margin", r2_gm, "placebo_x_con")
+summary_row("Excl. mega-caps", "Gross Margin", r3_gm, "post_x_contrast")
+cat(strrep("-", 80), "\n")
+
+cat("\nAll regressions: Firm + Quarter FE, clustered SE, Wayback-only, 2020+\n")
+cat("* p<0.10, ** p<0.05, *** p<0.01\n")
+
 cat("\nDone. All outputs saved to results/ and figures/\n")
