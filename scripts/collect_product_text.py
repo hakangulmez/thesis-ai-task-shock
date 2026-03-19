@@ -2,7 +2,10 @@
 Step 5: Collect product page text from Wayback Machine.
 
 For each firm: one CDX wildcard query to get all archived URLs,
-score them, fetch the top 3 pages, concatenate extracted text.
+score them, fetch the top 5 pages, concatenate extracted text.
+
+v2: Aggressive URL scoring to prioritize product/features pages.
+    Only re-scrapes firms with low-quality (homepage-only) text.
 """
 
 import re
@@ -27,7 +30,7 @@ HEADERS = {
 CDX_WAIT = 5.0
 FETCH_WAIT = 7.0
 RETRY_WAIT = 30
-TOP_N_PAGES = 3
+TOP_N_PAGES = 5
 MIN_WORDS = 150
 
 CDX_PARAMS = {
@@ -40,56 +43,62 @@ CDX_PARAMS = {
     "limit": "500",
 }
 
-# URL scoring rules (patterns match before /, ?, .html, or end-of-string)
+# URL scoring rules — aggressive v2
+# HIGH VALUE (score = 10): product-descriptive pages
 _END = r"(/|$|\?|\.html)"
-POSITIVE_PATTERNS = [
-    (r"/products?" + _END, 3),
-    (r"/platform" + _END, 3),
-    (r"/features?" + _END, 2),
-    (r"/solutions?" + _END, 2),
-    (r"/how-it-works" + _END, 2),
-    (r"/overview" + _END, 1),
-    (r"/why-", 1),
-    (r"/capabilities", 1),
+HIGH_VALUE_PATTERNS = [
+    r"/features?" + _END,
+    r"/capabilities" + _END,
+    r"/how-it-works" + _END,
+    r"/products?" + _END,
+    r"/platform" + _END,
+    r"/solutions?" + _END,
+    r"/why-us" + _END,
+    r"/use-cases?" + _END,
+    r"/what-we-do" + _END,
 ]
-NEGATIVE_PATTERNS = [
-    (r"/blogs?" + _END, -2),
-    (r"/news" + _END, -2),
-    (r"/pricing" + _END, -2),
-    (r"/about" + _END, -2),
-    (r"/legal" + _END, -3),
-    (r"/terms" + _END, -3),
-    (r"/privacy" + _END, -3),
-    (r"/careers?" + _END, -3),
-    (r"/login" + _END, -3),
-    (r"/signup" + _END, -3),
-    (r"/press" + _END, -2),
-    (r"/investor" + _END, -2),
-    (r"/support" + _END, -1),
-    (r"/docs" + _END, -1),
-    (r"/documentation" + _END, -1),
-    (r"/customer-stories" + _END, -1),
-    (r"/case-stud", -1),
-    (r"/webinar", -1),
-    (r"/events?" + _END, -1),
-    (r"\.(pdf|png|jpg|css|js|xml|json|zip|mp4|svg)($|\?)", -5),
-    (r"-identification" + _END, -3),
-    (r"-status" + _END, -2),
-    (r"-updates?" + _END, -2),
-    (r"/release-notes", -2),
-    (r"/changelog", -2),
-    (r"/api" + _END, -2),
-    (r"/integrations?" + _END, -1),
-    (r"/downloads?" + _END, -2),
-    (r"/vs[-/]", -1),
-    (r"/comparison", -1),
-    (r"/accessibility", -2),
-    (r"/sitemap", -3),
-    (r"/cookie", -3),
-    (r"/demo" + _END, -1),
-    (r"/contact" + _END, -2),
-    (r"/resources?" + _END, -1),
+# JUNK (score = -10): exclude entirely
+JUNK_PATTERNS_URL = [
+    r"/blogs?" + _END,
+    r"/press" + _END,
+    r"/news" + _END,
+    r"/events?" + _END,
+    r"/careers?" + _END,
+    r"/pricing" + _END,
+    r"/login" + _END,
+    r"/signup" + _END,
+    r"/demo" + _END,
+    r"/contact" + _END,
+    r"/legal" + _END,
+    r"/privacy" + _END,
+    r"/terms" + _END,
+    r"/about" + _END,
+    r"/404" + _END,
+    r"\.(pdf|jpg|png|ashx|css|js|xml|json|zip|mp4|svg|gif|ico|woff)($|\?)",
+    r"/(au|uk|de|fr|es|ja|zh|pt|it|nl|kr|in|sg|br|mx|ar|cl|co|se|no|dk|fi|pl|cz|hu|ro|tr|ru|tw|hk|nz|ie|at|ch|be|lu|il|ae|sa|za|ph|th|vn|id|my|kr|ap)(/|$)",
+    r"/investor" + _END,
+    r"/support" + _END,
+    r"/docs" + _END,
+    r"/documentation" + _END,
+    r"/customer-stories" + _END,
+    r"/case-stud",
+    r"/webinar",
+    r"/release-notes",
+    r"/changelog",
+    r"/api" + _END,
+    r"/downloads?" + _END,
+    r"/accessibility",
+    r"/sitemap",
+    r"/cookie",
+    r"/resources?" + _END,
+    r"-identification" + _END,
+    r"-status" + _END,
+    r"-updates?" + _END,
+    r"/vs[-/]",
+    r"/comparison",
+    r"/logos?" + _END,
 ]
+MIN_URL_SCORE = 5  # only fetch URLs scoring >= 5 (or homepage fallback)
 
 # Task-related verbs for text filtering
 TASK_VERBS = {
@@ -136,37 +145,32 @@ fail_logger = logging.getLogger("wayback_failures")
 
 
 def score_url(url: str, domain: str) -> int:
-    """Score a URL by relevance to product description."""
+    """Score a URL by relevance to product description.
+
+    Returns:
+        10  — high-value product/features/solutions page
+         1  — homepage (root domain, fallback only)
+       -10  — junk (blog, press, locale, media files, etc.)
+    """
     url_lower = url.lower()
     path = url_lower.split(domain.lower())[-1] if domain.lower() in url_lower else url_lower
 
-    score = 0
-
-    for pattern, points in POSITIVE_PATTERNS:
+    # Check junk first — reject immediately
+    for pattern in JUNK_PATTERNS_URL:
         if re.search(pattern, path):
-            score += points
+            return -10
 
-    for pattern, points in NEGATIVE_PATTERNS:
-        if re.search(pattern, path):
-            score += points
-
-    # Homepage gets 1 point
+    # Homepage: root domain only
     if re.match(r"^https?://[^/]+/?$", url):
-        score += 1
+        return 1
 
-    # Depth penalty: prefer shallower pages
-    segments = [s for s in path.strip("/").split("/") if s]
-    depth = len(segments)
-    if depth <= 1:
-        score += 2  # top-level page bonus
-    elif depth >= 3:
-        score -= (depth - 2)  # penalty for deep pages
+    # High-value product pages
+    for pattern in HIGH_VALUE_PATTERNS:
+        if re.search(pattern, path):
+            return 10
 
-    # Query string penalty
-    if "?" in url:
-        score -= 1
-
-    return score
+    # Everything else: unknown subpage, score 0
+    return 0
 
 
 def fetch_with_retry(url: str, params: Optional[dict] = None) -> Optional[requests.Response]:
@@ -233,11 +237,24 @@ def find_best_snapshots(domain: str) -> List[Tuple[str, str, int]]:
 
     scored.sort(key=lambda x: (x[0], x[1]), reverse=True)
 
-    # Return top N distinct pages
-    top = scored[:TOP_N_PAGES]
-    print("    CDX: %d unique URLs, top scores: %s" % (
-        len(scored),
-        ", ".join("%+d" % t[0] for t in top)), flush=True)
+    # Filter: only URLs scoring >= MIN_URL_SCORE
+    qualifying = [(s, ts, url) for s, ts, url in scored if s >= MIN_URL_SCORE]
+
+    if qualifying:
+        top = qualifying[:TOP_N_PAGES]
+    else:
+        # Fallback: use homepage if no qualifying URLs
+        homepage = [(s, ts, url) for s, ts, url in scored if s == 1]
+        if homepage:
+            top = homepage[:1]
+            print("    CDX: no qualifying URLs (score >= %d), falling back to homepage" %
+                  MIN_URL_SCORE, flush=True)
+        else:
+            print("    CDX: no qualifying URLs and no homepage found", flush=True)
+            return []
+
+    print("    CDX: %d unique URLs, %d qualifying (score >= %d), fetching %d" % (
+        len(scored), len(qualifying), MIN_URL_SCORE, len(top)), flush=True)
     for s, ts, url in top:
         print("      %+d  %s" % (s, url[:90]), flush=True)
 
@@ -390,10 +407,37 @@ def process_firm(ticker: str, company_name: str, domain: str) -> Optional[dict]:
     }
 
 
+QUALITY_PATH = "data/processed/wayback_quality.csv"
+
+
+def load_rescrape_tickers():
+    """Load tickers that need re-scraping (Category B or C from quality audit)."""
+    try:
+        qdf = pd.read_csv(QUALITY_PATH)
+    except FileNotFoundError:
+        print("WARNING: %s not found — will process all firms" % QUALITY_PATH, flush=True)
+        return None
+
+    # Only re-scrape firms with best_category != 'A'
+    rescrape = set(qdf[qdf["best_category"] != "A"]["ticker"].tolist())
+    skip = set(qdf[qdf["best_category"] == "A"]["ticker"].tolist())
+    print("Quality audit: %d Category A (skip), %d Category B/C (re-scrape)" % (
+        len(skip), len(rescrape)), flush=True)
+    return rescrape
+
+
 def main():
     t0 = time.time()
 
     df = pd.read_csv(INPUT_PATH)
+
+    # Load re-scrape list from quality audit
+    rescrape_tickers = load_rescrape_tickers()
+
+    # Filter to only firms that need re-scraping
+    if rescrape_tickers is not None:
+        df = df[df["ticker"].isin(rescrape_tickers)].reset_index(drop=True)
+        print("Filtered to %d firms needing re-scrape\n" % len(df), flush=True)
 
     total = len(df)
     est_min = total * (CDX_WAIT + FETCH_WAIT * TOP_N_PAGES) / 60
