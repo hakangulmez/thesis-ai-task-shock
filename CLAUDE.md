@@ -26,6 +26,10 @@ Two SBERT-based scores (all-MiniLM-L6-v2):
    high anchors (18) minus low anchors (10,
    infrastructure/security/real-time tasks)
    Mean -0.007, SD 0.081, range -0.19 to +0.28
+   +30% wider range, corr w/ high_score = 0.35
+
+Face validity confirmed across all 143 firms.
+Treatment variable construction complete.
 
 ## Simplified design
 Dropped switching costs, AI adoption position, and
@@ -146,7 +150,8 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] 10-K business descriptions collected (143/143 firms)
 [x] Thesis plan written (THESIS_PLAN.md)
 [x] Product text collected (106 Wayback + 37 10-K fallback)
-[x] Replicability index built (SBERT, 18 anchors, 143/143)
+[x] Replicability index built (SBERT, 18+10 anchors, 143/143)
+[x] Contrast score validated (face validity all 143 firms)
 [x] Master panel merged (2,982 rows, 143 firms)
 [x] DiD estimated — high_score: ln(Rev) β=-0.759*, p=0.060
 [x] DiD estimated — contrast_score: GM β=-0.076*, p=0.069
