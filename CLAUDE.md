@@ -15,10 +15,17 @@ heterogeneous financial outcomes after the ChatGPT
 shock (Nov 2022), determined by the task replicability
 of their core product?
 
-## Main treatment variable
-task_replicability_i [0-1]
-SBERT all-MiniLM-L6-v2, 18 anchor sentences
-Score range: 0.14-0.53, mean 0.318, SD 0.070
+## Treatment variables
+Two SBERT-based scores (all-MiniLM-L6-v2):
+
+1. high_score (= replicability_score)
+   18 high-replicability anchor sentences
+   Mean 0.340, SD 0.068, range 0.17-0.53
+
+2. contrast_score = high_score - low_score
+   high anchors (18) minus low anchors (10,
+   infrastructure/security/real-time tasks)
+   Mean -0.007, SD 0.081, range -0.19 to +0.28
 
 ## Simplified design
 Dropped switching costs, AI adoption position, and
@@ -44,14 +51,26 @@ Firm FE + Quarter FE + clustered SE at firm level
 Wild cluster bootstrap for inference
 
 ## Main results (trimmed 2020+ sample, bare DiD)
-ln(Revenue):      β = -0.759*, SE = 0.401, p<0.10
-Gross Margin:     β = +0.054,  SE = 0.083, ns
-Operating Margin: β = -0.434,  SE = 0.403, ns
+
+Mechanism 1 — Substitution (high_score treatment):
+  All firms:    ln(Rev) β=-0.759*,  SE=0.401, p=0.060
+  Wayback-only: ln(Rev) β=-1.051**, SE=0.427, p=0.016
+
+Mechanism 2 — Commodification (contrast_score treatment):
+  All firms:    Gross Margin β=-0.076*, SE=0.042, p=0.069
+  Wayback-only: Gross Margin β=-0.114*, SE=0.060, p=0.060
 
 ## Parallel trends — ALL PASS on trimmed 2020+ sample
-ln(Revenue):      F=0.89, p=0.54
-Gross Margin:     F=0.98, p=0.46
-Operating Margin: F=1.00, p=0.44
+
+high_score:
+  ln(Revenue): F=0.89, p=0.54
+  Gross Margin: F=0.98, p=0.46
+  Operating Margin: F=1.00, p=0.44
+
+contrast_score:
+  ln(Revenue): F=0.92, p=0.52
+  Gross Margin: F=0.65, p=0.77
+  Operating Margin: F=1.20, p=0.29
 
 ## Outcome variables
 PRIMARY:   ln_revenue, gross_margin, operating_margin
@@ -129,8 +148,10 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Product text collected (106 Wayback + 37 10-K fallback)
 [x] Replicability index built (SBERT, 18 anchors, 143/143)
 [x] Master panel merged (2,982 rows, 143 firms)
-[x] DiD estimated (revenue β=-0.759*, p<0.10)
-[x] Parallel trends tested (all pass, 2020+ sample)
+[x] DiD estimated — high_score: ln(Rev) β=-0.759*, p=0.060
+[x] DiD estimated — contrast_score: GM β=-0.076*, p=0.069
+[x] Parallel trends tested (all pass, both treatments)
+[x] Wayback-only subsample strengthens both results
 [ ] Wild cluster bootstrap inference
 [ ] Event study plots finalized
 [ ] Heterogeneity analysis complete
