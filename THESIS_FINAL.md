@@ -248,6 +248,8 @@ To investigate whether the effects concentrate in specific software sub-sectors,
 | Revenue in levels ($M) | -445.83 | 0.017** | — | — |
 | 10-K only text | +0.877 | 0.153 | — | — |
 | Mixed text (143 firms) | -0.759 | 0.060* | — | — |
+| SIC 7372 only (66 firms) — Revenue | -0.723 | 0.178 | — | — |
+| SIC 7372 only (66 firms) — GM | — | — | -0.138 | 0.093* |
 
 Notes: All specifications use Wayback-only sample (106 firms) and 2020+ trimmed period except where noted. Firm + Quarter FE throughout.
 \* p<0.10, \*\* p<0.05
@@ -263,6 +265,8 @@ Using the GPT-4 release (March 14, 2023) as the treatment date instead of the Ch
 ### 7.3 Sample Composition
 
 Excluding the two largest firms in the Wayback-only sample by mean revenue — ADP ($4.41 billion mean quarterly revenue) and DXC Technology ($3.84 billion) — produces results that are virtually unchanged: ln(revenue) β = −1.066 (p = 0.015); gross margin β = −0.115 (p = 0.060). The main findings are not driven by the mechanical influence of mega-cap outliers.
+
+As a further check against the concern that the replicability index proxies for product category rather than within-category AI exposure, I restrict the sample to SIC 7372 (prepackaged software) firms only. Within this homogeneous sub-sector of 66 firms — where all firms nominally produce front-office SaaS products — the commodification result is preserved and actually strengthens in magnitude (β = −0.138, p = 0.093), while the revenue coefficient retains its sign but loses individual significance due to the reduced sample (β = −0.723, p = 0.178, N = 66). The stability of the margin result within a single product category suggests the contrast score captures genuine within-category variation in AI exposure rather than a coarse front-office versus infrastructure distinction.
 
 ### 7.4 Placebo Test
 

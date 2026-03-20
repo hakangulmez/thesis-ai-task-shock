@@ -318,6 +318,7 @@ COVID placebo (2020~Q1) & $-0.598$ & $0.068$ & $-0.037$ & $0.494$ \\
 Revenue in levels (\$M) & $-445.83$ & $0.017^{**}$ & --- & --- \\
 10-K only text (143 firms) & $+0.877$ & $0.153$ & --- & --- \\
 Mixed text (143 firms) & $-0.759$ & $0.060^*$ & --- & --- \\
+SIC 7372 only (66 firms) & $-0.723$ & $0.178$ & $-0.138$ & $0.093^*$ \\
 \bottomrule
 \end{tabular}
 
@@ -336,6 +337,8 @@ Using the GPT-4 release (March 14, 2023) as the treatment date produces virtuall
 \subsection{Sample Composition}
 
 Excluding ADP (\$4.41 billion mean quarterly revenue) and DXC Technology (\$3.84 billion) produces virtually unchanged results: $\ln(\text{revenue})$ $\beta = -1.066$ ($p = 0.015$); gross margin $\beta = -0.115$ ($p = 0.060$).
+
+As a further check against the concern that the replicability index proxies for product category rather than within-category AI exposure, I restrict the sample to SIC~7372 (prepackaged software) firms only. Within this homogeneous sub-sector of 66 firms --- where all firms nominally produce front-office SaaS products --- the commodification result is preserved and actually strengthens in magnitude ($\beta = -0.138$, $p = 0.093$), while the revenue coefficient retains its sign but loses individual significance due to the reduced sample ($\beta = -0.723$, $p = 0.178$, $N = 66$). The stability of the margin result within a single product category suggests the contrast score captures genuine within-category variation in AI exposure rather than a coarse front-office versus infrastructure distinction.
 
 \subsection{Placebo Test}
 

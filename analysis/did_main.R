@@ -1065,3 +1065,57 @@ write.csv(table3, "results/table3_robustness.csv",
           row.names = FALSE)
 cat("Saved: results/table3_robustness.csv\n")
 print(table3)
+
+# =============================================================
+# 15. WITHIN-SIC-7372 ROBUSTNESS
+# =============================================================
+
+cat("\n")
+cat("=" , rep("=", 69), "\n", sep = "")
+cat("WITHIN SIC 7372 ROBUSTNESS CHECK\n")
+cat("=" , rep("=", 69), "\n\n", sep = "")
+
+universe <- read.csv("data/raw/firm_universe_v1.csv")
+sic_map <- universe[, c("ticker", "sic_code")]
+
+df_7372 <- df %>%
+  filter(fiscal_year >= 2020,
+         text_source == "wayback") %>%
+  left_join(sic_map, by = "ticker") %>%
+  filter(sic_code == 7372)
+
+cat("SIC 7372 firms:", n_distinct(df_7372$ticker), "\n")
+cat("SIC 7372 observations:", nrow(df_7372), "\n\n")
+
+df_7372$year_quarter <- paste0(
+  df_7372$fiscal_year, "Q", df_7372$fiscal_quarter)
+
+m_7372_rev <- feols(
+  ln_revenue ~ post_x_replicability |
+    ticker + year_quarter,
+  data = df_7372, cluster = ~ticker)
+
+m_7372_gm <- feols(
+  gross_margin ~ post_x_contrast |
+    ticker + year_quarter,
+  data = df_7372, cluster = ~ticker)
+
+cat(sprintf("%-45s %8s %8s %8s %6s\n",
+    "Specification", "Beta", "SE", "p-value", "Sig"))
+cat(strrep("-", 80), "\n")
+
+for (info in list(
+  list("ln(Revenue) x replicability [7372 only]",
+       m_7372_rev, "post_x_replicability"),
+  list("Gross Margin x contrast [7372 only]",
+       m_7372_gm, "post_x_contrast")
+)) {
+  b <- coef(info[[2]])[info[[3]]]
+  se <- summary(info[[2]])$se[info[[3]]]
+  p <- pvalue(info[[2]])[info[[3]]]
+  sig <- ifelse(p<0.01,"***",
+          ifelse(p<0.05,"**",
+          ifelse(p<0.10,"*","")))
+  cat(sprintf("%-45s %8.4f %8.4f %8.4f %6s\n",
+      info[[1]], b, se, p, sig))
+}

@@ -169,6 +169,9 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Event study plots finalized
 [x] Heterogeneity analysis complete
 [x] Robustness checks complete (3/3)
+[x] Within-SIC-7372 check: GM holds
+    beta=-0.138* p=0.093, Revenue directional
+    beta=-0.723 p=0.178 (power issue)
 [x] Thesis written
 [x] THESIS_FINAL.md with figures and tables
 [x] thesis.tex LaTeX version created
