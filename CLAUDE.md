@@ -175,3 +175,7 @@ All treatment vars: pre-Nov 2022 text ONLY
 [x] Thesis written
 [x] THESIS_FINAL.md with figures and tables
 [x] thesis.tex LaTeX version created
+[x] Three-period analysis complete
+    Revenue: Early -0.767** | Advanced -1.207**
+    Margin: Early ns | Advanced -0.149**
+    Commodification is a late/threshold phenomenon
