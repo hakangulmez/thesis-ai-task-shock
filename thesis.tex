@@ -105,9 +105,9 @@ The task-based approach to understanding technology's labor market effects origi
 
 \subsection{LLM-Specific Exposure Measurement}
 
-The most directly relevant prior work is \citet{eloundou2024gpts}, who develop a framework for measuring occupation-level exposure to large language models by assessing which O*NET task descriptors GPT-4 can perform. They find that approximately 19 percent of workers have at least 50 percent of their tasks exposed to LLMs. Their methodology measures \emph{worker-level} exposure through the lens of occupational task content --- a fundamentally different construct from the \emph{product-level} exposure measured in this thesis.
+The most directly relevant prior work is \citet{eloundou2024gpts}, who develop a framework for measuring occupation-level exposure to large language models by assessing which O*NET task descriptors GPT-4 can perform. They find that approximately 19 percent of workers have at least 50 percent of their tasks exposed to LLMs, with exposure highest among white-collar, high-wage occupations. Their methodology measures \emph{worker-level} exposure through the lens of occupational task content --- a fundamentally different construct from the \emph{product-level} exposure measured in this thesis. A software firm may employ workers with low personal LLM exposure (e.g., engineers writing specialized infrastructure code) while selling a product whose core tasks are highly replicable by LLMs (e.g., a document generation platform). To see why this distinction matters concretely: a firm can simultaneously benefit from AI at the worker level --- its engineers write code faster with GitHub Copilot --- while being threatened by AI at the product level --- its customers no longer need to pay for its document generation platform because ChatGPT performs the same task at zero marginal cost. Existing research captures only the first effect. This thesis captures the second.
 
-\citet{labaschin2025extending} extend the GPTs-are-GPTs framework to the firm level by aggregating worker-level exposure scores across each firm's workforce composition. Their approach measures how many of a firm's \emph{employees} perform LLM-exposed tasks, which captures the firm's internal productivity opportunity but not its external competitive threat. The distinction between these two channels --- internal productivity gain versus external competitive threat --- is the conceptual contribution of this thesis.
+\citet{labaschin2025extending} extend the GPTs-are-GPTs framework to the firm level by aggregating worker-level exposure scores across each firm's workforce composition. Their approach measures how many of a firm's \emph{employees} perform LLM-exposed tasks, which captures the firm's internal productivity opportunity but not its external competitive threat. The distinction between internal productivity gain versus external competitive threat is the conceptual contribution of this thesis. Existing literature measures AI exposure either at the worker level within firms or at the aggregate economy level; this thesis introduces product-level exposure as a third and distinct construct that captures competitive threats from AI that neither worker-level nor aggregate measures can detect.
 
 \subsection{Firm-Level Technology Adoption and Productivity}
 
@@ -129,9 +129,16 @@ The sample spans five SIC sub-codes: 7370 (13 firms), 7371 (7 firms), 7372 (93 f
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/revenue_trend_by_group.png}
-\caption{Quarterly revenue trend: high vs low replicability firms (top and bottom quartile). The vertical dashed line marks the ChatGPT launch (2022~Q4). Both groups grew in absolute terms; the finding is differential growth.}
-\label{fig:revenue_trend}
+\includegraphics[width=0.9\textwidth]{figures/pipeline_funnel.png}
+\caption{Sample construction funnel. Starting from 7,509 NYSE/Nasdaq-listed firms, sequential filters yield the final sample of 143 B2B software firms.}
+\label{fig:funnel}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/sic_breakdown.png}
+\caption{Distribution of sample firms by SIC sub-code. SIC 7372 (Prepackaged Software) dominates with 93 firms.}
+\label{fig:sic}
 \end{figure}
 
 \subsection{Financial Panel}
@@ -147,6 +154,20 @@ The task replicability index is constructed in three steps, with all inputs date
 \textbf{Step 2: SBERT scoring.} Each firm's cleaned text is segmented into sentences and encoded using the all-MiniLM-L6-v2 Sentence-BERT model \citep{reimers2019sentence}. Two sets of anchor sentences are defined: 18 high-replicability sentences and 10 low-replicability sentences. The high score (range: 0.17--0.53, SD $= 0.068$) and contrast score (range: $-0.19$ to $+0.28$, SD $= 0.081$, correlation with high score $= 0.35$) are computed for each firm.
 
 \textbf{Step 3: Validation.} Face validity is confirmed across all 143 firms. The highest-scoring firms by contrast score are ZipRecruiter ($+0.277$), Sprout Social ($+0.242$), and GitLab ($+0.183$). The lowest-scoring firms are BlackBerry ($-0.186$), CrowdStrike ($-0.183$), and Tenable ($-0.181$).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/score_distributions.png}
+\caption{Replicability score distributions by text source. Wayback-sourced text (blue) produces lower, more discriminating scores than 10-K fallback text (orange).}
+\label{fig:score_dist}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/top_bottom_firms.png}
+\caption{Top and bottom 15 firms by contrast score. Positive scores indicate products oriented toward LLM-replicable tasks; negative scores indicate infrastructure-oriented products.}
+\label{fig:topbottom}
+\end{figure}
 
 \subsection{Summary Statistics}
 
@@ -252,6 +273,13 @@ To translate the log-scale coefficient into interpretable dollar terms, I estima
 
 \begin{figure}[H]
 \centering
+\includegraphics[width=0.9\textwidth]{figures/revenue_trend_by_group.png}
+\caption{Quarterly revenue trend: high vs low replicability firms (top and bottom quartile). The vertical dashed line marks the ChatGPT launch (2022~Q4). Both groups grew in absolute terms; the finding is differential growth.}
+\label{fig:revenue_trend}
+\end{figure}
+
+\begin{figure}[H]
+\centering
 \includegraphics[width=0.9\textwidth]{figures/revenue_levels.png}
 \caption{Mean quarterly revenue by replicability quartile, pre- and post-shock. Both groups grew in absolute terms; the finding is differential growth, not absolute decline.}
 \label{fig:revenue_levels}
@@ -308,25 +336,46 @@ Second, and more strikingly, margin commodification is a late phenomenon. In the
 
 These results are conservative. The replicability index was constructed from 2022-era product page text and anchor sentences calibrated to ChatGPT capabilities. It does not capture exposure to coding, multimodal, or agentic tasks that define the advanced AI era. A replicability index calibrated to 2024-era capabilities would likely produce larger advanced AI era coefficients. The intensification finding is therefore a lower bound.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/three_period_coef.png}
+\caption{Three-period analysis: coefficients for both mechanisms across three time periods. Dark bars = $p<0.05$, light = $p\geq0.05$.}
+\label{fig:threeperiod}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/three_period_threshold.png}
+\caption{Commodification threshold: gross margin coefficient is absent in the early AI era and strongly significant in the advanced AI era, consistent with the enterprise credibility threshold mechanism.}
+\label{fig:threshold}
+\end{figure}
+
 \subsection{Heterogeneity by SIC Sub-Code}
 
 \begin{table}[H]
 \centering
 \caption{Heterogeneity by SIC code (Wayback-only, 2020+)}
 \label{tab:heterogeneity}
-\begin{tabular}{llcc}
+\begin{tabular}{llcccc}
 \toprule
-SIC Group & Description & $\ln(\text{Rev})$ $\beta$ & GM $\beta$ \\
+SIC Group & Description & $\ln(\text{Rev})$ $\beta$ & $p$ & GM $\beta$ & $p$ \\
 \midrule
-7370/7371 & Computer services & $-1.998$ & $-0.117$ \\
-7372 & Prepackaged software & $-0.723$ & $-0.138^*$ \\
-7373/7374 & Systems integration & $-2.032$ & $-0.027$ \\
+7370/7371 & Computer services & $-1.998$ & $0.113$ & $-0.117$ & $0.474$ \\
+7372 & Prepackaged software & $-0.723$ & $0.178$ & $-0.138^*$ & $0.093$ \\
+7373/7374 & Systems integration & $-2.032$ & $0.105$ & $-0.027$ & $0.799$ \\
 \bottomrule
 \end{tabular}
 
 \smallskip
 \small Notes: Gross margin commodification concentrates in SIC 7372 (prepackaged software, 66 firms).
 \end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/heterogeneity_sic.png}
+\caption{Heterogeneity by SIC sub-code. Gross margin commodification concentrates in SIC 7372 (prepackaged software).}
+\label{fig:het}
+\end{figure}
 
 %% ============================================================
 \section{Robustness}
@@ -354,6 +403,13 @@ SIC 7372 only (66 firms) & $-0.723$ & $0.178$ & $-0.138$ & $0.093^*$ \\
 \smallskip
 \small Notes: All specifications use Wayback-only sample (106 firms) and 2020+ trimmed period except where noted. Firm + Quarter FE throughout. $^*p<0.10$, $^{**}p<0.05$.
 \end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/robustness_checks.png}
+\caption{Robustness coefficients across specifications. Results are stable across all alternative specifications.}
+\label{fig:robust}
+\end{figure}
 
 \subsection{Text Source Validation}
 
@@ -383,7 +439,7 @@ Estimating the substitution specification with revenue in millions of dollars yi
 
 \subsection{Interpretation}
 
-The two mechanisms identified in this thesis --- substitution and commodification --- are empirically distinguishable along three dimensions. First, they use different treatment variables (correlation $r = 0.35$). Second, they predict different outcomes: substitution affects revenue, while commodification affects margins. Third, they operate on different time scales: revenue effects emerge from approximately four quarters post-shock, while margin compression emerges from approximately five to nine quarters post-shock.
+The two mechanisms identified in this thesis --- substitution and commodification --- are empirically distinguishable along three dimensions. First, they use different treatment variables: the substitution channel operates through absolute task replicability (high score), while the commodification channel operates through relative task replicability (contrast score), and these two measures are only weakly correlated ($r = 0.35$). Second, they predict different outcomes: substitution affects revenue, while commodification affects margins. Third, they operate on different time scales: the event study reveals that revenue effects emerge from approximately four quarters post-shock, while margin compression emerges from approximately five to nine quarters post-shock --- consistent with the theoretical prediction that commodification operates gradually as contracts expire, procurement teams renegotiate, and competitive pressure accumulates. The three-period analysis adds a fourth dimension of distinguishability: commodification is a late phenomenon that requires AI credibility to cross an enterprise procurement threshold, while substitution begins operating from the first contract cycles after the shock.
 
 \subsection{Connection to Aggregate Effects}
 
@@ -391,7 +447,7 @@ The finding of substantial firm-level heterogeneity is consistent with \citeauth
 
 \subsection{Limitations}
 
-Several limitations qualify the interpretation. First, the SBERT-based replicability index depends on the choice of anchor sentences. Second, the Wayback Machine provides product page text for 106 of 143 firms; the remaining 37 use 10-K fallback text. Third, the marginal significance of the COVID-era revenue placebo test ($p = 0.068$) suggests that pre-existing differential demand patterns may partially confound the revenue result, although the direction is conservative. Fourth, the sample is limited to publicly listed U.S.\ software firms.
+Several limitations qualify the interpretation of these results. First, the SBERT-based replicability index depends on the choice of anchor sentences. While the contrast score (correlation 0.35 with the high score) confirms that the two treatment variables capture genuinely different variation, and face validity is strong across all 143 firms, the specific anchor set is researcher-constructed and could be modified. Second, the Wayback Machine provides product page text for 106 of 143 firms; the remaining 37 firms use 10-K fallback text that demonstrably compresses the treatment variable. The preferred specification addresses this by restricting to Wayback-only firms, but this reduces the sample by 26 percent. Third, the marginal significance of the COVID-era revenue placebo test ($p = 0.068$) suggests that pre-existing differential demand patterns may partially confound the revenue result, although the direction of the confound is conservative. Fourth, the sample is limited to publicly listed U.S.\ software firms, which may not be representative of private software companies. Fifth, the replicability index was calibrated to 2022-era ChatGPT capabilities and does not capture exposure to 2024-era agents and coding tools, meaning the advanced AI era results are conservative estimates.
 
 \subsection{Future Research}
 
