@@ -165,9 +165,9 @@ The ChatGPT launch on November 30, 2022 serves as the identifying shock. Three c
 
 The main estimating equation is:
 
-$$Y_{it} = \alpha_i + \delta_t + \beta(\text{Post}_t \times \text{Treatment}_i) + \varepsilon_{it}$$
+$$Y_{it} = \alpha_i + \delta_t + \beta(\text{Shock}_t \times \text{Replicability}_i) + \varepsilon_{it}$$
 
-where $Y_{it}$ is the outcome variable for firm $i$ in quarter $t$, $\alpha_i$ are firm fixed effects that absorb all time-invariant firm characteristics, $\delta_t$ are quarter-year fixed effects that absorb all macroeconomic shocks common to all firms, $\text{Post}_t$ equals one if $t \geq$ 2022 Q4, and $\text{Treatment}_i$ is the pre-determined replicability measure. Standard errors are clustered at the firm level.
+where $Y_{it}$ is the outcome variable for firm $i$ in quarter $t$, $\alpha_i$ are firm fixed effects that absorb all time-invariant firm characteristics, $\delta_t$ are quarter-year fixed effects that absorb all macroeconomic shocks common to all firms, $\text{Shock}_t$ equals one if $t \geq$ 2022 Q4 (the ChatGPT launch quarter), and $\text{Replicability}_i$ is the pre-determined task replicability measure for firm $i$, constructed exclusively from text dated before November 2022. Standard errors are clustered at the firm level.
 
 Two specifications test the two mechanisms:
 
@@ -215,15 +215,15 @@ Table 2 presents the main difference-in-differences results for the preferred sp
 Notes: Wild cluster bootstrap p-values (B=9,999 Rademacher iterations). Standard errors in parentheses, clustered at firm level.
 \* p<0.10, \*\* p<0.05, \*\*\* p<0.01
 
-**Panel A: Substitution Mechanism.** The coefficient on Post × replicability_score in the ln(revenue) regression is −1.051 (SE = 0.427, conventional p = 0.016, wild cluster bootstrap p = 0.018). The result is statistically significant at the 5 percent level under both conventional and bootstrap inference. The negative sign confirms the substitution prediction: firms whose products perform tasks more similar to what LLMs can do experienced significantly lower post-shock revenue growth. The magnitude implies that a one-unit increase in the replicability score — which spans a range of 0.36 in the sample — is associated with a 1.051 log-point reduction in quarterly revenue.
+**Panel A: Substitution Mechanism.** Firms with higher task replicability experienced significantly lower post-shock revenue growth, consistent with the substitution mechanism (β = −1.051, SE = 0.427, bootstrap p = 0.018). The effect is significant at the 5 percent level under both conventional and wild cluster bootstrap inference. The magnitude implies that a one-unit increase in the replicability score — which spans a range of 0.36 in the sample — is associated with a 1.051 log-point reduction in quarterly revenue.
 
-**Panel B: Commodification Mechanism.** The coefficient on Post × contrast_score in the gross margin regression is −0.114 (SE = 0.060, conventional p = 0.060, bootstrap p = 0.047). The conventional p-value is marginally significant at the 10 percent level, but the wild cluster bootstrap — which corrects for potential over-rejection with a moderate number of clusters — strengthens the result to significance at the 5 percent level. The negative sign confirms the commodification prediction: firms with higher relative task replicability experienced gross margin compression post-shock. The magnitude implies that a one-unit increase in the contrast score is associated with an 11.4 percentage point reduction in gross margin.
+**Panel B: Commodification Mechanism.** Firms with higher relative task replicability experienced gross margin compression post-shock without corresponding revenue decline, consistent with the commodification mechanism (β = −0.114, SE = 0.060, bootstrap p = 0.047). The wild cluster bootstrap — which corrects for potential over-rejection with a moderate number of clusters — strengthens the result from marginal to conventional significance at the 5 percent level. The magnitude implies that a one-unit increase in the contrast score is associated with an 11.4 percentage point reduction in gross margin.
 
 The two treatment variables are only weakly correlated (r = 0.35), and they predict different outcomes — replicability_score predicts revenue effects but not margin effects, while contrast_score predicts margin effects but not revenue effects. This pattern is consistent with substitution and commodification operating as empirically distinguishable mechanisms rather than different manifestations of a single underlying process.
 
 ### 6.2 Economic Magnitude
 
-To translate the log-scale coefficient into interpretable dollar terms, I estimate the same specification with revenue in millions of dollars as the outcome variable. The coefficient is −445.83 (SE = 183.22, p = 0.017), confirming that the result is not an artifact of the log transformation. A one standard deviation increase in task replicability (SD = 0.068) is associated with $30.3 million lower quarterly revenue, representing 7.8 percent of the sample mean quarterly revenue of $388 million.
+To translate the log-scale coefficient into interpretable dollar terms, I estimate the same specification with revenue in millions of dollars as the outcome variable. The coefficient is −445.83 (SE = 183.22, p = 0.017), confirming that the result is not an artifact of the log transformation. A one standard deviation increase in task replicability (SD = 0.068) is associated with $30.3 million lower quarterly revenue, representing 7.8 percent of the sample mean quarterly revenue of $388 million. This magnitude is economically substantial: it implies that the substitution mechanism, operating through customer replacement of specialized software with general-purpose AI tools, redirected approximately $30 million per quarter away from high-replicability firms for every standard deviation of AI exposure.
 
 [Figure 5: Revenue trend by replicability group]
 [Figure 6: Revenue levels pre/post by group]
