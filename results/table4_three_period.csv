@@ -1,0 +1,5 @@
+"Period","Rev_Beta","Rev_SE","Rev_p","Rev_sig","GM_Beta","GM_SE","GM_p","GM_sig"
+"Full post-shock (baseline)",-1.051,0.427,0.0155,"**",-0.114,0.06,0.0599,"*"
+"Early AI (2022 Q4 - 2023 Q4)",-0.767,0.337,0.0249,"**",-0.052,0.076,0.4929,"ns"
+"Advanced AI (2024 Q1+)",-1.207,0.49,0.0153,"**",-0.149,0.062,0.0183,"**"
+"Wald test (advanced vs early)",-0.44,NA,0.054,"*",-0.097,NA,0.125,"ns"
