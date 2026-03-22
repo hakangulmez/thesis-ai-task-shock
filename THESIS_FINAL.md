@@ -36,13 +36,23 @@ The remainder of this thesis is organized as follows. Section 2 develops the the
 
 ## 2. Theoretical Framework
 
-### 2.1 Task-Based Production Framework
+### 2.1 Three Stages of Technology–Task Interaction
+
+The relationship between technology and task performance has evolved through three distinct stages, each characterized by a different allocation of tasks between human labor, software capital, and general-purpose AI.
+
+In the first stage — the complementarity era of the 1970s through the 1980s — software tools augmented human labor without substituting for it. Word processors made secretaries more productive. Spreadsheets made accountants more productive. The production relationship combined human cognitive input with software as a productivity-enhancing complement: labor and software working together to produce output. Software in this period had no autonomous task-performing capability — it amplified what humans could do but could not replace them.
+
+In the second stage — the labor substitution era of the 1990s through the 2010s — software began performing discrete cognitive tasks autonomously. Bookkeeping software replaced bookkeepers. Customer relationship management platforms automated sales pipeline tracking. Enterprise resource planning systems replaced entire departments of data entry and reconciliation workers. This is the era that Autor, Levy, and Murnane (2003) documented: software capital substituting for workers in routine cognitive task space, reshaping the wage distribution and hollowing out middle-skill employment. Software moved from complement to substitute — but the unit of displacement was always the worker.
+
+In the third stage — the capital substitution era beginning in 2022 — generative AI moves the automation frontier into task space previously owned not by workers but by software products. LLMs can replicate the cognitive output of entire software product categories — document generation, support ticket classification, basic analytics, content scheduling — at near-zero marginal cost. The unit of displacement shifts from workers to products. AI does not merely substitute for human labor; it substitutes for the specialized software capital that had previously performed these tasks, shifting the unit of displacement from workers to products. This second-order displacement — AI displacing software that had itself displaced workers — is the theoretical phenomenon this thesis measures.
+
+### 2.2 Task-Based Production Framework
 
 Autor, Levy, and Murnane (2003) reconceptualize production as a bundle of discrete tasks allocated between labor and capital according to comparative advantage. In their framework, routine cognitive tasks — rule-based procedures such as bookkeeping, clerical processing, and formulaic calculations — are substitutable by computer capital because they follow explicit, codifiable rules. Nonroutine cognitive tasks, by contrast — those requiring judgment, creativity, complex communication, abstract reasoning, and situational adaptation — were considered structurally resistant to automation because they could not be reduced to a set of programmable instructions. Software capital in this framework complemented nonroutine cognitive labor by handling the routine components of knowledge work, raising the marginal productivity of human workers performing the nonroutine residual. The empirical implication was a secular increase in demand for workers performing nonroutine cognitive tasks and a secular decline in demand for workers performing routine cognitive tasks — a prediction borne out by two decades of labor market evidence.
 
 The ALM framework was enormously influential in shaping how economists understood the relationship between technology and labor markets, but it contained an implicit assumption that proved fragile: that the boundary between routine and nonroutine tasks was technologically stable. Tasks classified as nonroutine in 2003 — drafting coherent prose, summarizing complex documents, answering questions requiring contextual judgment — were assumed to remain nonroutine indefinitely because no foreseeable technology could codify the implicit knowledge required to perform them. This assumption held for nearly two decades. Machine learning systems excelled at pattern recognition within structured data — image classification, recommendation engines, fraud detection — but could not perform open-ended cognitive tasks involving natural language understanding, generation, and reasoning.
 
-### 2.2 The Automation Frontier
+### 2.3 The Automation Frontier
 
 Acemoglu and Restrepo (2018, 2019) formalize and extend the ALM framework by modeling the automation frontier as an endogenously determined boundary between the set of tasks performed by labor and the set performed by machines. When automation technology improves, it pushes this frontier outward: tasks previously performed by labor are displaced to capital, reducing labor's task share and compressing wages for workers who performed those tasks — the displacement effect. Simultaneously, economic growth and innovation create new tasks at the frontier that require human capabilities machines have not yet acquired — the reinstatement effect. The net impact on labor demand, wages, and the labor share of income depends on the relative speed of displacement versus reinstatement.
 
@@ -50,7 +60,7 @@ Critically, the Acemoglu-Restrepo framework implies that a technology which move
 
 The public release of ChatGPT on November 30, 2022 constituted precisely such a discrete frontier shift. ChatGPT demonstrated that a general-purpose AI system could perform a broad range of nonroutine cognitive tasks — tasks that the ALM framework had classified as structurally safe from automation — at near-zero marginal cost and with sufficient quality to be commercially useful. This moved the automation frontier into territory that prior technology had left untouched, creating a discrete, unanticipated shock to the task structure of knowledge-intensive industries.
 
-### 2.3 Software Firms as Task Externalizers
+### 2.4 Software Firms as Task Externalizers
 
 Software firms occupy a unique position in the task-based framework that existing theory does not fully capture. Unlike physical capital goods that augment a worker's productivity at a specific task, B2B software firms are task-performing services: they externalize cognitive tasks from customer organizations and build recurring revenue businesses around performing those tasks more efficiently than customers could manage internally. A customer relationship management platform performs contact management, pipeline tracking, and sales forecasting tasks. A cybersecurity platform performs threat detection, vulnerability scanning, and incident response tasks. A business intelligence tool performs data aggregation, metric computation, and report generation tasks. In each case, the revenue model depends on customers continuing to find it more efficient to purchase task performance as a subscription service rather than perform those tasks internally with general-purpose tools.
 
@@ -60,7 +70,7 @@ This is the theoretical gap that this thesis fills. Existing research on AI's ec
 
 There is a further structural parallel worth making explicit. The Acemoglu—Restrepo framework treats software as capital — it sits on the displacing side of the automation frontier, pushing workers out of routine cognitive tasks. The framework therefore has no mechanism for analyzing what happens when a more powerful automating technology displaces the software itself. Yet the logic is identical: just as prior software displaced clerical workers from bookkeeping, document processing, and data entry tasks by performing those tasks more cheaply, LLMs now displace the software products that had come to own those tasks. The displacement mechanism is the same — a more capable technology enters the task space previously occupied by a less capable one and performs those tasks at lower cost. Only the unit of analysis changes: from worker to software product. This thesis fills that gap by treating B2B software firms not as capital goods in their customers' production functions but as task-performing agents whose revenue depends on the continued non-substitutability of their product tasks.
 
-### 2.4 Three Mechanisms and Predictions
+### 2.5 Three Mechanisms and Predictions
 
 Three possible outcomes emerge from the interaction between product task replicability and the AI shock.
 
@@ -70,7 +80,7 @@ Three possible outcomes emerge from the interaction between product task replica
 
 **Reinforcement.** When task replicability is low — because the product's core tasks require deep integration with customer infrastructure, depend on proprietary data, or involve complex multi-system orchestration — the ChatGPT shock creates an opportunity rather than a threat. These firms absorb LLM capabilities as component inputs, making an already powerful platform more capable. Revenue and margins improve as AI augments a defensible product position. The empirical signature is a zero or positive coefficient — a prediction consistent with the null results observed for low-replicability firms in this thesis, though direct confirmation would require product-level revenue attribution data showing AI-adjacent revenue growth that is not available in public financial filings.
 
-### 2.5 Connection to Acemoglu (2024)
+### 2.6 Connection to Acemoglu (2024)
 
 Acemoglu (2024) argues that AI's aggregate productivity effect will be modest — approximately 0.66 percent total factor productivity gain over ten years — because only easy-to-learn tasks are automatable in the near term and their share of total economic output is small. This thesis operates at the firm level within a single industry and tests the distribution of outcomes underlying that aggregate. Acemoglu's aggregate modesty is entirely consistent with substantial firm-level heterogeneity: some firms face severe commodification while others experience reinforcement, and the aggregate effect across all firms averages to a modest net impact. By constructing a continuous replicability measure that maps onto Acemoglu's distinction between easy-to-learn and hard-to-learn tasks, this thesis provides micro-level evidence on the distribution that drives the aggregate result.
 
