@@ -133,7 +133,7 @@ rev_by_group <- df_wb3 %>%
 cat("\nMean quarterly revenue by group (millions USD):\n")
 print(as.data.frame(rev_by_group))
 
-# Revenue growth comparison figure
+# Revenue growth comparison figure — median instead of mean
 rev_growth <- df_wb3 %>%
   filter(rep_quartile %in% c(1,4)) %>%
   mutate(
@@ -146,36 +146,30 @@ rev_growth <- df_wb3 %>%
   ) %>%
   group_by(group, period) %>%
   summarise(
-    mean_rev = mean(revenue_m, na.rm=TRUE),
-    se_rev = sd(revenue_m, na.rm=TRUE) / sqrt(n()),
+    median_rev = median(revenue_m, na.rm=TRUE),
     .groups = "drop"
   )
 
 p_levels <- ggplot(rev_growth,
-    aes(x = period, y = mean_rev,
+    aes(x = period, y = median_rev,
         fill = group)) +
   geom_bar(stat = "identity",
            position = position_dodge(0.7),
            width = 0.6, alpha = 0.85) +
-  geom_errorbar(
-    aes(ymin = mean_rev - 1.96*se_rev,
-        ymax = mean_rev + 1.96*se_rev),
-    position = position_dodge(0.7),
-    width = 0.2, linewidth = 0.6) +
   scale_fill_manual(values = c(
     "High Replicability (Q4)" = "#E63946",
     "Low Replicability (Q1)" = "#457B9D")) +
   labs(
-    title = "Mean Quarterly Revenue by Replicability Quartile",
+    title = "Median Quarterly Revenue by Replicability Quartile",
     subtitle = paste0(
       "DiD: beta=-$445.8M (SE=183.2, p=0.017**) | ",
       "1 SD increase = -$30.3M per quarter (-7.8%)"),
     x = "",
-    y = "Mean Quarterly Revenue ($M)",
+    y = "Median Quarterly Revenue ($M)",
     fill = "Replicability Group",
     caption = paste0(
       "Wayback-only (106 firms), 2020+ | ",
-      "Error bars = 95% CI | ",
+      "Median reduces influence of outlier firm sizes | ",
       "Both groups grew — finding is differential growth")
   ) +
   theme_minimal(base_size = 12) +
@@ -192,7 +186,18 @@ ggsave("figures/revenue_levels.png",
        p_levels, width = 10, height = 6, dpi = 150)
 cat("Saved: figures/revenue_levels.png\n")
 
-# Quarterly revenue trend by group
+# Quarterly revenue trend by group — indexed to 100 at 2022 Q3
+df_wb3 <- df_wb3 %>%
+  group_by(ticker) %>%
+  mutate(
+    base_rev = mean(revenue_m[
+      fiscal_year == 2022 &
+      fiscal_quarter == 3],
+      na.rm = TRUE),
+    rev_indexed = (revenue_m / base_rev) * 100
+  ) %>%
+  ungroup()
+
 rev_trend <- df_wb3 %>%
   filter(rep_quartile %in% c(1,4)) %>%
   mutate(
@@ -205,7 +210,7 @@ rev_trend <- df_wb3 %>%
   group_by(group, yq_num,
            fiscal_year, fiscal_quarter) %>%
   summarise(
-    mean_rev = mean(revenue_m, na.rm=TRUE),
+    mean_rev = mean(rev_indexed, na.rm=TRUE),
     .groups = "drop"
   ) %>%
   mutate(year_quarter = paste0(
@@ -220,6 +225,10 @@ p_trend <- ggplot(rev_trend,
            fill = "gray90", alpha = 0.4) +
   geom_line(linewidth = 1) +
   geom_point(size = 1.5) +
+  geom_hline(yintercept = 100,
+             linetype = "dotted",
+             color = "gray50",
+             linewidth = 0.5) +
   geom_vline(xintercept = 2022.75,
              linetype = "dashed",
              color = "black",
@@ -234,11 +243,11 @@ p_trend <- ggplot(rev_trend,
            color = "gray30") +
   labs(
     title = "Quarterly Revenue Trend: High vs Low Replicability",
-    subtitle = "Top and bottom quartile by replicability score",
+    subtitle = "Indexed to 100 at 2022 Q3 per firm, then averaged by group",
     x = "Quarter",
-    y = "Mean Quarterly Revenue ($M)",
+    y = "Revenue Index (2022 Q3 = 100)",
     color = "Group",
-    caption = "Wayback-only (106 firms) | Gray = post-shock period"
+    caption = "Wayback-only (106 firms) | Gray = post-shock period | Each firm indexed individually"
   ) +
   theme_minimal(base_size = 12) +
   theme(
