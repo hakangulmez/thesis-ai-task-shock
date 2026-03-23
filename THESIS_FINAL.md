@@ -230,8 +230,6 @@ To translate the log-scale coefficient into interpretable dollar terms, I estima
 
 Comparing the top and bottom quartiles of the replicability distribution provides further intuition. Using median quarterly revenue to reduce the influence of large outlier firms, high-replicability firms (top quartile) grew from $96.3 million pre-shock to $125.3 million post-shock — a 30.1 percent increase. Low-replicability firms (bottom quartile) grew from $80.2 million to $137.4 million — a 71.3 percent increase. The approximately 41 percentage point gap in growth rates is even larger than the mean-based comparison suggests, indicating that size heterogeneity was suppressing rather than inflating the descriptive growth differential. Importantly, both groups grew in absolute terms: the finding is differential growth, not absolute decline. High-replicability firms did not shrink; they grew more slowly than their low-replicability counterparts.
 
-These descriptive comparisons use raw revenue levels and are sensitive to the size composition of each quartile. When median rather than mean revenue is used — which is robust to large-firm outliers — the growth gap between groups widens to approximately 41 percentage points (71.3 percent for low-replicability firms versus 30.1 percent for high-replicability firms), suggesting that large high-replicability firms grew faster than the typical firm in their quartile and that the mean-based 15 percentage point figure is conservative. The DiD regression addresses size heterogeneity directly by log-scaling revenue and including firm fixed effects, which absorb all time-invariant size differences and identify the treatment effect from within-firm variation over time.
-
 ### 6.3 Event Study
 
 [Figure 7: Event study — ln(Revenue)]
