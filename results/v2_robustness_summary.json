@@ -1,0 +1,28 @@
+{
+  "description": "Full v2 rescrape results",
+  "firms_total": 143,
+  "sentences_total": 24495,
+  "pages_v2_firms": 103,
+  "score_correlations": {
+    "high_score_spearman": 0.568,
+    "contrast_score_spearman": 0.91
+  },
+  "did_results": {
+    "original": {
+      "substitution_beta": -1.051,
+      "substitution_p": 0.016,
+      "commodification_beta": -0.114,
+      "commodification_p": 0.06
+    },
+    "v2_full": {
+      "substitution_beta": 0.054,
+      "substitution_p": 0.876,
+      "commodification_beta": -0.138,
+      "commodification_p": 0.053
+    }
+  },
+  "conclusion": {
+    "substitution": "NOT ROBUST \u2014 collapses with multi-page text (p=0.876). Original result was measurement artifact from single-page homepage text.",
+    "commodification": "ROBUST \u2014 strengthens with multi-page text, beta -0.114 to -0.138, p 0.060 to 0.053. contrast_score stable across text quality (Spearman 0.910)."
+  }
+}
