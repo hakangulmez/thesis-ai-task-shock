@@ -210,3 +210,23 @@ Completed:
 
 Remaining:
 - Final thesis formatting and submission
+
+---
+
+## Measurement Robustness Audit
+
+(conducted March 2026)
+
+Full product page rescrape:
+- 103 Wayback firms x up to 20 pages each
+- 24,495 sentence-level SBERT scores
+- Script: `scripts/scrape_and_score_v2.py`
+
+Results:
+
+| Mechanism | Original beta | V2-Full beta | Robust? |
+|---|---|---|---|
+| Substitution (ln rev) | -1.051** | +0.054 (ns) | No |
+| Commodification (GM) | -0.114* | -0.138* | Yes |
+
+Conclusion: The commodification result is the robust primary finding. The substitution result was sensitive to single-page homepage text scoring and does not survive multi-page product page measurement.
