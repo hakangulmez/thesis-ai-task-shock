@@ -1,0 +1,144 @@
+ticker,early_ai,agentic_ai,reasoning
+ADBE,55,75,Creative tools partially replicable; complex workflows protect
+ADP,15,25,"Payroll/HR requires regulatory compliance, tax infrastructure"
+ADSK,10,20,"CAD/3D engineering requires precision tools, not text"
+AEYE,65,85,Web accessibility scanning highly automatable by AI
+AGYS,15,25,"Hospitality POS/PMS requires hardware, real-time ops"
+AI,40,65,Enterprise AI platform increasingly commoditized by LLMs
+ALKT,10,20,"Digital banking requires FI integration, regulatory compliance"
+APPF,25,45,Property management partially replicable; payments less so
+APPN,55,80,Low-code workflow builder highly replicable by AI agents
+ASAN,70,85,Task/project management directly replicable by AI agents
+AVPT,15,30,M365 governance requires deep platform integration
+AWRE,10,15,Biometric authentication requires specialized hardware
+BAND,10,15,CPaaS requires own telecom network infrastructure
+BB,10,20,Endpoint security requires kernel-level real-time ops
+BILL,55,70,Financial ops automation replicable; payment rails less so
+BKYI,10,15,Biometric IAM requires hardware identity infrastructure
+BL,60,75,Financial close automation highly replicable by AI
+BLIN,65,85,Web CMS eCommerce content highly replicable by AI
+BLKB,45,65,Nonprofit CRM fundraising partially replicable
+BLZE,10,15,Cloud storage requires physical data centers
+BOX,40,65,Content management replicable; security/compliance less so
+BRZE,50,75,Customer engagement campaigns increasingly automatable
+BSY,10,20,Infrastructure engineering CAD requires domain precision
+CACI,15,25,Defense IT requires clearances and domain expertise
+CCLD,35,55,Healthcare IT partially replicable; EHR compliance less so
+CDLX,30,55,Purchase analytics needs proprietary FI data access
+CDNS,10,15,EDA chip design requires extreme precision tools
+CEVA,10,15,IP/DSP licensing for hardware not replicable by AI
+CFLT,10,20,Real-time data streaming requires low-level infrastructure
+CLVT,50,70,Research analytics intelligence partially commoditized
+CREX,35,60,Digital signage content partially replicable; hardware less so
+CRM,50,70,CRM partially replicable; deep ecosystem integrations protect
+CRNC,45,65,Automotive voice AI increasingly commoditized by LLMs
+CRWD,10,20,"Real-time threat detection needs kernel agents, threat intel"
+CSGS,20,35,Telecom billing needs deep carrier system integrations
+CVLT,10,20,Enterprise data protection requires infrastructure ops
+CXM,55,75,Unified CXM social channels increasingly automatable
+DBX,20,45,File storage has infrastructure moat; collaboration replicable
+DDOG,10,20,"Cloud monitoring requires persistent pipelines, real-time"
+DMRC,15,25,Digital watermarking is specialized IP technology
+DOCN,10,15,Cloud infrastructure requires physical data centers
+DOCS,30,50,Physician networking partially replicable; network effect protects
+DOMO,55,75,BI dashboards and analytics increasingly replicable by AI
+DOX,15,25,Telecom BSS/OSS requires deep carrier integration
+DSGX,20,35,Logistics network needs proprietary data and integrations
+DT,10,20,APM/observability requires deep cloud infrastructure integration
+DUOT,5,10,Rail inspection uses proprietary hardware sensors
+DXC,25,45,IT services partially replicable; legacy system management less so
+EGAN,70,85,Customer service knowledge hub directly replicable by LLMs
+EGHT,15,30,UCaaS requires telecom infrastructure and real-time voice
+EPAM,30,60,Software engineering services increasingly automatable by AI
+ESTC,15,30,Search/observability requires data infrastructure at scale
+EVTC,10,20,Payment processing requires banking infrastructure
+EXFY,65,80,Expense management receipt scanning highly automatable
+FA,50,65,Background screening partially replicable; regulatory data less so
+FDS,50,70,Financial data analytics replicable; proprietary data protects
+FIVN,45,65,Cloud contact center automatable; telecom infra protects
+FRSH,60,80,CX/ITSM/CRM highly replicable by AI-powered alternatives
+FSLY,10,15,Edge CDN requires global physical infrastructure
+GDDY,45,65,Website builder partially replicable; domain/hosting less so
+GDYN,30,55,Digital transformation services partially automatable
+GTLB,25,55,DevOps platform partially replicable; CI/CD infra protects
+GWRE,15,25,P&C insurance core system requires regulatory/actuary depth
+HCAT,40,60,Healthcare analytics replicable; EHR data access protects
+HSTM,60,75,Healthcare learning/compliance content highly replicable
+HUBS,55,75,CRM/marketing automation increasingly replicable by AI
+IDN,15,25,Document authentication requires physical verification
+IIIV,15,25,Vertical payments requires regulatory infrastructure
+INLX,60,80,Document management/digitization highly replicable
+INTA,50,70,Professional services workflow replicable; compliance less so
+JKHY,10,20,Core banking requires deep financial infrastructure
+LDOS,15,25,Defense IT requires security clearances and domain expertise
+LPSN,70,85,Conversational AI platform directly threatened by LLMs
+MANH,20,35,Supply chain needs real-time logistics data integrations
+MAPS,45,65,Cannabis marketplace replicable; regulatory compliance less so
+MCHX,65,80,Call analytics/conversation intelligence directly replicable
+MDB,10,20,Database infrastructure requires low-level storage ops
+MGNI,20,35,Ad auction/SSP requires real-time bidding infrastructure
+MQ,10,20,Card issuing requires banking/payment network infrastructure
+MSFT,30,55,Diversified; Azure infra protects; M365 partially replicable
+NET,10,20,Edge network requires global physical infrastructure
+NOW,45,65,Workflow automation replicable; deep enterprise integrations protect
+NTCT,10,20,Network monitoring requires hardware probes and packet analysis
+NTNX,10,15,HCI requires hypervisor and hardware infrastructure
+NTWK,20,35,Finance/leasing software requires regulatory domain expertise
+OKTA,10,20,IAM requires cryptographic infrastructure and protocol expertise
+ONTF,55,75,Webinar/digital engagement content highly replicable
+OOMA,15,25,UCaaS requires telecom network infrastructure
+ORCL,15,30,Database/ERP requires mission-critical infrastructure depth
+OTEX,50,70,Information management/document workflow replicable
+PATH,55,80,RPA automation increasingly replicable by AI agents
+PAYC,20,35,Payroll/HCM requires tax/compliance infrastructure
+PCOR,30,50,Construction management partially replicable; field ops less so
+PCTY,20,35,HCM/payroll requires regulatory compliance infrastructure
+PD,35,60,Incident management replicable; real-time ops integration less so
+PDFS,10,15,Semiconductor yield requires fab-level data and expertise
+PEGA,55,80,Low-code/decisioning highly replicable by AI agents
+PRCH,40,60,Home services marketplace partially replicable by AI
+PRGS,25,45,App dev tools partially replicable; deployment infra protects
+PSN,15,25,Defense IT requires clearances and classified system access
+PTC,10,20,CAD/PLM/IIoT requires precision engineering and hardware
+PUBM,20,35,SSP requires real-time bidding infrastructure
+QLYS,15,25,Cloud security scanning requires deep infrastructure access
+QTWO,10,20,Digital banking requires FI integration and compliance
+RAMP,20,40,Data identity requires proprietary data network access
+RBBN,10,20,Telecom network infrastructure requires carrier-grade hardware
+RDVT,35,55,Identity intelligence replicable; proprietary data network protects
+RNG,15,30,UCaaS requires telecom infrastructure and real-time voice
+RPD,20,35,Security analytics requires live threat intel infrastructure
+S,10,20,AI endpoint security requires kernel-level real-time ops
+SAIC,15,25,Government IT requires clearances and classified infrastructure
+SKIL,65,80,Corporate learning content highly replicable by AI
+SLP,25,45,Pharma simulation requires domain-specific scientific models
+SMSI,45,65,Mobile messaging/safety partially replicable by AI
+SNPS,10,15,EDA chip design requires extreme precision and verification
+SPSC,20,35,EDI supply chain requires trading partner integrations
+SPT,60,80,Social media management/content highly replicable by AI
+SSNC,20,35,Fund admin requires regulatory and financial infrastructure
+SSTI,5,10,Gunshot detection requires physical acoustic sensor hardware
+STEM,15,25,Energy storage optimization requires hardware control systems
+TBRG,30,50,EHR/revenue cycle partially replicable; clinical workflow less so
+TCX,10,20,Domain/fiber requires physical network infrastructure
+TDC,25,45,Data warehouse requires infrastructure; analytics replicable
+TEAD,40,60,Content recommendation partially replicable; publisher network protects
+TENB,15,25,Vulnerability scanning requires deep system access
+TLS,15,25,Government security requires clearances and hardware
+TRAK,25,40,Supply chain compliance requires regulatory data integrations
+TTD,20,35,DSP requires real-time bidding infrastructure
+TWLO,15,30,CPaaS requires telecom infrastructure and carrier relationships
+TYL,20,35,Public sector software requires government system integrations
+UPLD,50,70,Work management/content replicable; acquired product base protects
+VEEV,20,35,Life sciences cloud requires regulatory/validation compliance
+VERI,45,65,AI computing platform increasingly commoditized
+VRME,20,35,Brand authentication requires physical label infrastructure
+VRNS,15,25,Data security requires filesystem-level access and monitoring
+VRSK,45,65,Insurance analytics replicable; proprietary data moat protects
+VRSN,5,10,DNS registry is pure critical infrastructure
+WDAY,25,45,Enterprise HCM/finance requires deep system integrations
+WK,60,80,Regulatory/ESG reporting highly replicable by AI
+YEXT,55,75,Digital presence/search management replicable by AI
+ZIP,70,85,Job matching directly replicable by LLM-powered platforms
+ZM,20,40,Video comms requires infrastructure; AI features replicable
+ZS,10,20,Zero trust security requires network proxy infrastructure

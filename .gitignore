@@ -1,0 +1,72 @@
+# Secrets
+.env
+*.env
+secrets.py
+CLAUDE.md
+
+# Raw/sensitive data
+data/raw/
+text_data/
+
+# Large files
+*.jsonl
+api_logs/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# R artifacts
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.blg
+*.bbl
+thesis.pdf
+
+# Unused files
+thesis_references.bib
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Intermediate/unused data files
+data/processed/ai_mentions_10k.csv
+data/processed/firm_texts_combined.csv
+data/processed/manual_class.csv
+data/processed/master_panel_onet_sim.csv
+data/processed/onet_contrast_scores.csv
+data/processed/onet_e1e0_contrast.csv
+data/processed/onet_variants.csv
+data/processed/panel_manual_class.csv
+data/processed/panel_onet_filtered.csv
+data/processed/replicability_10k_scores.csv
+data/processed/replicability_v2_scores.csv
+data/processed/replicability_v3_scores.csv
+data/processed/rubric_contrast_scores.csv
+data/processed/rubric_literature_scores.csv
+data/processed/rubric_sent_scores.csv
+data/processed/rubric_v2_scores.csv
+data/processed/rubric_v2_wb_scores.csv
+data/processed/task_dedup.csv
+data/processed/task_embeddings.npy
+data/processed/wb_quality_audit.csv
+
+# Claude internal
+.claude/
+
+# Unused analysis scripts
+analysis/wcb_rubric.R
