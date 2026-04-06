@@ -70,3 +70,7 @@ data/processed/wb_quality_audit.csv
 
 # Unused analysis scripts
 analysis/wcb_rubric.R
+
+# Removed legacy files
+data/raw/eloundou/
+thesis.tex

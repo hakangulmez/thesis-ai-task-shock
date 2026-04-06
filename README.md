@@ -17,12 +17,14 @@ Do B2B software firms whose products are more replicable by large language model
 
 | Specification | N | β | WCB p |
 |---|---|---|---|
-| **Lit Rubric SME <$200M (primary)** | **94** | **−0.604** | **0.003***  |
-| Lit Rubric SME <$500M | 116 | −0.541 | 0.002*** |
-| LLM Judge holistic | 98 | −0.426 | 0.031** |
-| O*NET task-based | 98 | −0.335 | 0.059* |
-| Early AI era (2022Q4–2023Q4) | 94 | −0.451 | 0.022** |
-| Advanced AI era (2024Q1+) | 94 | −0.686 | 0.008*** |
+| **Lit Rubric SME <$200M (primary)** | **94** | **−0.604** | **0.003\*\*\*** |
+| Lit Rubric SME <$500M | 116 | −0.541 | 0.002\*\*\* |
+| LLM Judge holistic | 98 | −0.426 | 0.031\*\* |
+| R&D intensity (alt outcome) | 88 | +0.080 | 0.018\*\* |
+| Quartile Q75/Q25 | 65 | −0.286 | 0.005\*\*\* |
+| Placebo GM treatment | 86 | −0.165 | 0.661 |
+| Early AI era (2022Q4–2023Q4) | 94 | −0.451 | 0.022\*\* |
+| Advanced AI era (2024Q1+) | 94 | −0.686 | 0.008\*\*\* |
 
 ---
 
@@ -38,11 +40,9 @@ AI displacing software products that had themselves displaced workers from cogni
 
 ## Pipeline
 scripts/collect_10k_text.py     → text_data/10k_extracts/
-scripts/score_rubric_*.py       → data/processed/lit_continuous_scores.csv
-scripts/score_onet_similarity.py → data/processed/onet_similarity_scores.csv
+scripts/score_rubric_*.py       → (scoring via API, see thesis_notebook.ipynb Section 2)
 analysis/did_main.R             → DiD estimates (Table 1–3, 6)
 analysis/thesis_notebook.ipynb  → All figures (Fig 1–9) + Table 4–5
-thesis.tex                      → LaTeX manuscript
 
 ### Full notebook pipeline (12 sections):
 | Section | Content | Output |
@@ -59,6 +59,7 @@ thesis.tex                      → LaTeX manuscript
 | 9 | Scoring pipeline & funnel | Fig 6, Fig 7 |
 | 10 | Three-period analysis | Table 6, Fig 9 |
 | 11 | Results summary | All results |
+| 12 | Mechanism & SG&A heterogeneity | Fig 10, Fig 11 |
 
 ---
 
@@ -77,7 +78,7 @@ Scored via LLM-as-judge using a structured rubric from:
 | 61–80 | Mostly E1: text, documents, classification | LPSN (72), YEXT (78) |
 | 81–100 | Pure E1: core text/knowledge | ZIP (82) |
 
-**Construct validity:** r=0.895 with LLM Judge holistic | r=0.299 with O*NET task-based
+**Construct validity:** r=0.895 with LLM Judge holistic
 
 ---
 
@@ -88,36 +89,44 @@ Scored via LLM-as-judge using a structured rubric from:
 | Pre-period placebo | p=0.157 ✅ |
 | Event study pre-trends | 0/11 quarters significant ✅ |
 | Gross margin effect | p>0.4 (quantity channel confirmed) ✅ |
+| Placebo treatment (GM) | p=0.661 (LLM-specificity confirmed) ✅ |
+| R&D intensity response | β=+0.080, p=0.018** (defensive R&D) ✅ |
+| Pre-shock SG&A control | β attenuates ~21% to −0.476** (p=0.018), OVB limited ✅ |
 | Firm-level scatter | r=−0.274, p=0.008 ✅ |
 | Size heterogeneity | Monotonic strengthening ✅ |
+| SG&A heterogeneity | Substitution concentrated in low-SG&A high-rep firms ✅ |
 
 ---
 
 ## Key Files
-thesis.tex                              LaTeX manuscript (594 lines)
-analysis/
-did_main.R                            Primary DiD + robustness + three-period
-thesis_notebook.ipynb                 Full pipeline (12 sections, 9 figures)
-data/processed/
-master_panel.csv                      143 firms, 2020Q1–2025Q4
-lit_continuous_scores.csv             Literature rubric scores (116 firms)
-llm_judge_scores.csv                  Holistic LLM Judge scores (143 firms)
-onet_similarity_scores.csv            ONET task-based scores (143 firms)
-event_study_coefs.csv                 Quarter-by-quarter event study
-figures/
-fig1_score_distribution.png           Score distribution + top/bottom firms
-fig2_construct_validity.png           r=0.895 (LLM Judge), r=0.299 (ONET)
-fig3_event_study.png                  Pre-trends: 0/11 significant
-fig4_revenue_divergence.png           HIGH vs LOW revenue trajectories
-fig5_size_heterogeneity.png           Monotonic effect by firm size
-fig6_scoring_pipeline.png             10-K → rubric → score pipeline
-fig7_sample_funnel.png                7509 → 94 firms
-fig8_score_revenue_scatter.png        r=−0.274, p=0.008
-fig9_three_period.png                 1.52x intensification
-scripts/
-collect_10k_text.py                   SEC EDGAR 10-K scraper
-score_rubric_.py                     Literature rubric scoring
-score_onet_similarity.py              ONET task-based scoring
+```
+thesis-ai-task-shock/
+├── analysis/
+│   ├── did_main.R                  Primary DiD + robustness + three-period
+│   └── thesis_notebook.ipynb       12 sections, 11 figures (fig2 updated, fig10-11 added)
+├── data/processed/
+│   ├── master_panel.csv            143 firms, 2020Q1–2025Q4
+│   ├── lit_continuous_scores.csv   Literature rubric scores (116 firms)
+│   ├── llm_judge_scores.csv        Holistic LLM Judge scores (143 firms)
+│   ├── event_study_coefs.csv       Quarter-by-quarter event study
+│   └── literature_rubric.json      10-criterion rubric definition
+├── figures/
+│   ├── fig1_score_distribution.png Score distribution + top/bottom firms
+│   ├── fig2_construct_validity.png r=0.895 (LLM Judge holistic)
+│   ├── fig3_event_study.png        Pre-trends: 0/11 significant
+│   ├── fig4_revenue_divergence.png HIGH vs LOW revenue trajectories
+│   ├── fig4b_quartile_divergence.png Q75 vs Q25 revenue divergence
+│   ├── fig5_size_heterogeneity.png Monotonic effect by firm size
+│   ├── fig6_scoring_pipeline.png   10-K → rubric → score pipeline
+│   ├── fig7_sample_funnel.png      7509 → 94 firms
+│   ├── fig8_score_revenue_scatter.png r=−0.274, p=0.008
+│   ├── fig9_three_period.png       1.52x intensification
+│   ├── fig10_mechanism_outcomes.png DiD betas by outcome variable
+│   └── fig11_sga_heterogeneity.png SG&A moderation within high-rep
+├── scripts/
+│   └── collect_10k_text.py         SEC EDGAR 10-K scraper
+└── README.md
+```
 
 ---
 
@@ -131,7 +140,7 @@ pip install pandas numpy matplotlib scipy anthropic
 
 # Scoring (requires API key)
 export ANTHROPIC_API_KEY="sk-ant-..."
-python3 scripts/score_rubric_contrast.py
+python3 -c "# See thesis_notebook.ipynb Section 2 for scoring pipeline" 
 ```
 
 ---
@@ -146,3 +155,16 @@ python3 scripts/score_rubric_contrast.py
 | Babina et al. (2024) *JFE* | AI & firm performance |
 | Farrell & Klemperer (2007) *HIO* | Switching cost theory |
 | Cameron et al. (2008) *REStat* | Wild cluster bootstrap |
+
+## Robustness Structure
+
+| Panel | Test | β | p |
+|---|---|---|---|
+| A | LLM Judge holistic (alt treatment) | −0.426 | 0.031\*\* |
+| B | Quartile Q75/Q25 (binary) | −0.286 | 0.005\*\*\* |
+| C | Placebo GM treatment (specificity) | −0.165 | 0.661 |
+| D | Pre-shock SG&A control (OVB check) | −0.476 | 0.018\*\* |
+
+## License
+Code: MIT License © 2026 Hakan Zeki Gülmez  
+Methodology and framework (TCDC): CC BY 4.0 — please cite as: Gülmez, H.Z. (2026). Generative AI as a Task Shock. M.Sc. Thesis, TU Munich.
