@@ -268,7 +268,7 @@ cat("  R&D intensity positive     -> defensive investment response to AI threat\
 # ---- NEW ROBUSTNESS: Panel B — R&D Intensity ----
 cat("\n=== PANEL B: R&D Intensity as Outcome ===\n")
 pB <- p200[!is.na(p200$rd_intensity),]
-pB$post_x_treat <- pB$post * pB$treat
+pB$post_x_treat <- pB$post * pB$lit_n
 mB <- feols(rd_intensity~post_x_treat|ticker+year_quarter,
     data=pB, cluster=~ticker)
 pwB <- wcb(mB, pB, "post_x_treat")
@@ -375,3 +375,74 @@ for(grp in list(
 
 cat("\nNote: Triple interaction (Post x rho x SGA) p=0.857 — insufficient power.\n")
 cat("Pattern is suggestive: substitution concentrated in low-SGA high-rep firms.\n")
+
+# ── INFRASTRUCTURE ROBUSTNESS ──────────────────────────────────────────────
+cat("\n\n=== INFRASTRUCTURE ROBUSTNESS ===\n")
+
+# Core infrastructure/security firms that benefit from AI infrastructure boom
+# Narrow list: pure infra/security/CDN only (MDB, ESTC, NTNX = data/analytics, excluded)
+INFRA_TICKERS <- c("DDOG", "NET", "CRWD", "ZS", "CFLT", "DOCN", "FSLY")
+
+cat("Infrastructure firms excluded:", length(INFRA_TICKERS), "\n")
+cat("Tickers:", paste(INFRA_TICKERS, collapse=", "), "\n\n")
+
+# --- Panel F: Exclude infrastructure firms ---
+cat("--- Panel E: Exclude core infrastructure firms (narrow list) ---\n")
+
+p200_no_infra <- p200[!p200$ticker %in% INFRA_TICKERS, ]
+cat("N firms after exclusion:", n_distinct(p200_no_infra$ticker), "\n")
+
+m_infra_excl <- feols(ln_revenue ~ post_x_lit |
+    ticker + year_quarter,
+    data=p200_no_infra, cluster=~ticker)
+p_infra_excl <- wcb(m_infra_excl, p200_no_infra, "post_x_lit")
+
+cat(sprintf("  beta=%.4f SE=%.4f clust_p=%.3f WCB=%.3f%s (n=%d)\n\n",
+    coef(m_infra_excl)[1], se(m_infra_excl)[1],
+    pvalue(m_infra_excl)[1], p_infra_excl, sig(p_infra_excl),
+    n_distinct(p200_no_infra$ticker)))
+
+# --- Panel G: Infrastructure interaction control ---
+cat("--- Panel F: Infrastructure interaction control ---\n")
+
+p200$infra_dummy <- as.integer(p200$ticker %in% INFRA_TICKERS)
+p200$post_x_infra <- p200$post * p200$infra_dummy
+
+cat("Infra firms in sample:", sum(p200$infra_dummy[!duplicated(p200$ticker)]), "\n")
+
+m_infra_ctrl <- feols(ln_revenue ~ post_x_lit + post_x_infra |
+    ticker + year_quarter,
+    data=p200, cluster=~ticker)
+
+cat(sprintf("  beta_main  (Post x LitScore) = %.4f | SE = %.4f | p = %.4f\n",
+    coef(m_infra_ctrl)["post_x_lit"],
+    se(m_infra_ctrl)["post_x_lit"],
+    pvalue(m_infra_ctrl)["post_x_lit"]))
+cat(sprintf("  beta_infra (Post x InfraDum) = %.4f | SE = %.4f | p = %.4f\n",
+    coef(m_infra_ctrl)["post_x_infra"],
+    se(m_infra_ctrl)["post_x_infra"],
+    pvalue(m_infra_ctrl)["post_x_infra"]))
+
+# WCB for main coefficient in Panel G via FWL
+p200_g <- p200[!is.na(p200$infra_dummy),]
+p200_g$post_x_lit_resid <- residuals(
+    feols(post_x_lit ~ post_x_infra | ticker + year_quarter,
+          data=p200_g, cluster=~ticker))
+p200_g$ln_rev_resid <- residuals(
+    feols(ln_revenue ~ post_x_infra | ticker + year_quarter,
+          data=p200_g, cluster=~ticker))
+mg_partial <- feols(ln_rev_resid ~ post_x_lit_resid,
+    data=p200_g, cluster=~ticker)
+pg_wcb <- wcb(mg_partial, p200_g, "post_x_lit_resid")
+cat(sprintf("  WCB p (beta_main) = %.4f%s\n", pg_wcb, sig(pg_wcb)))
+
+cat("\n=== INFRASTRUCTURE ROBUSTNESS SUMMARY ===\n")
+cat(sprintf("Main result:        beta = -0.604, WCB p = 0.003  (n=94)\n"))
+cat(sprintf("Panel E (excl):     beta = %.4f,  WCB p = %.3f%s  (n=%d)\n",
+    coef(m_infra_excl)[1], p_infra_excl, sig(p_infra_excl),
+    n_distinct(p200_no_infra$ticker)))
+cat(sprintf("Panel F (ctrl):     beta_main = %.4f,  WCB p = %.3f%s\n",
+    coef(m_infra_ctrl)["post_x_lit"], pg_wcb, sig(pg_wcb)))
+cat(sprintf("                    beta_infra = %.4f  (p = %.3f)\n",
+    coef(m_infra_ctrl)["post_x_infra"],
+    pvalue(m_infra_ctrl)["post_x_infra"]))
