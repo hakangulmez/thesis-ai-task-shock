@@ -446,3 +446,98 @@ cat(sprintf("Panel F (ctrl):     beta_main = %.4f,  WCB p = %.3f%s\n",
 cat(sprintf("                    beta_infra = %.4f  (p = %.3f)\n",
     coef(m_infra_ctrl)["post_x_infra"],
     pvalue(m_infra_ctrl)["post_x_infra"]))
+
+# ── SEGMENT × TIME FE ROBUSTNESS ─────────────────────────────────────────
+cat("\n\n=== SEGMENT × TIME FE ROBUSTNESS ===\n")
+
+seg <- read.csv("data/processed/segment_classification.csv")
+p200_seg <- merge(p200, seg[,c("ticker","segment")], by="ticker")
+p200_seg$seg_qt <- paste0(p200_seg$segment, "_", p200_seg$year_quarter)
+
+cat("\n--- Segment Distribution (SME $200M) ---\n")
+seg_dist <- p200_seg %>%
+    group_by(segment) %>%
+    summarise(
+        n_firms = n_distinct(ticker),
+        mean_rep = mean(lit_score[!duplicated(ticker)]),
+        .groups="drop"
+    ) %>% arrange(desc(mean_rep))
+for(i in 1:nrow(seg_dist)){
+    cat(sprintf("  %-25s n=%2d  mean_lit=%.1f\n",
+        seg_dist$segment[i], seg_dist$n_firms[i], seg_dist$mean_rep[i]))
+}
+
+m_seg <- feols(ln_revenue ~ post_x_lit | ticker + seg_qt,
+    data=p200_seg, cluster=~ticker)
+
+# WCB for segment FE spec
+p200_seg_wcb <- p200_seg
+obs_seg <- coef(m_seg)[1]
+p200_seg_wcb$y0 <- p200_seg_wcb$ln_revenue - obs_seg * p200_seg_wcb$post_x_lit
+m0_seg <- feols(y0 ~ post_x_lit | ticker + seg_qt,
+    data=p200_seg_wcb, cluster=~ticker)
+res_seg <- residuals(m0_seg)
+firms_seg <- unique(p200_seg_wcb$ticker)
+set.seed(42)
+boot_seg <- replicate(999, {
+    w <- sample(c(-1,1), length(firms_seg), replace=TRUE)
+    names(w) <- firms_seg
+    p200_seg_wcb$wt <- w[p200_seg_wcb$ticker]
+    p200_seg_wcb$yb <- fitted(m0_seg) + res_seg * p200_seg_wcb$wt
+    coef(feols(yb ~ post_x_lit | ticker + seg_qt,
+        data=p200_seg_wcb, cluster=~ticker))[1]
+})
+p_seg <- mean(abs(boot_seg) >= abs(obs_seg))
+
+cat(sprintf("\nSegment×Time FE: beta=%.4f SE=%.4f WCB=%.3f%s (n=%d)\n",
+    coef(m_seg)[1], se(m_seg)[1], p_seg, sig(p_seg),
+    n_distinct(p200_seg$ticker)))
+cat(sprintf("Baseline (firm+time FE): beta=-0.604, WCB p=0.003\n"))
+cat(sprintf("Attenuation: %.1f%%\n",
+    (1 - abs(coef(m_seg)[1])/0.604)*100))
+
+# ── CONTINUOUS INFRASTRUCTURE PROXIMITY CONTROL ───────────────────────────
+cat("\n\n=== CONTINUOUS INFRA PROXIMITY CONTROL ===\n")
+
+p200_inf <- merge(p200, seg[,c("ticker","segment")], by="ticker")
+p200_inf$infra_prox <- case_when(
+    p200_inf$segment == "security_infrastructure" ~ 1.0,
+    p200_inf$segment == "devtools_analytics" ~ 0.5,
+    TRUE ~ 0.0
+)
+p200_inf$post_x_infra_cont <- p200_inf$post * p200_inf$infra_prox
+
+m_inf_cont <- feols(ln_revenue ~ post_x_lit + post_x_infra_cont |
+    ticker + year_quarter,
+    data=p200_inf, cluster=~ticker)
+
+# WCB for main coefficient (direct bootstrap of full model)
+obs_inf <- coef(m_inf_cont)["post_x_lit"]
+p200_inf$y0_inf <- p200_inf$ln_revenue - obs_inf * p200_inf$post_x_lit
+m0_inf <- feols(y0_inf ~ post_x_lit + post_x_infra_cont |
+    ticker + year_quarter,
+    data=p200_inf, cluster=~ticker)
+res_inf <- residuals(m0_inf)
+firms_inf <- unique(p200_inf$ticker)
+set.seed(42)
+boot_inf <- replicate(999, {
+    w <- sample(c(-1,1), length(firms_inf), replace=TRUE)
+    names(w) <- firms_inf
+    p200_inf$wt <- w[p200_inf$ticker]
+    p200_inf$yb <- fitted(m0_inf) + res_inf * p200_inf$wt
+    coef(feols(yb ~ post_x_lit + post_x_infra_cont |
+        ticker + year_quarter,
+        data=p200_inf, cluster=~ticker))["post_x_lit"]
+})
+p_inf_cont <- mean(abs(boot_inf) >= abs(obs_inf))
+
+cat(sprintf("Continuous infra control: beta_main=%.4f SE=%.4f WCB=%.3f%s (n=%d)\n",
+    coef(m_inf_cont)["post_x_lit"],
+    se(m_inf_cont)["post_x_lit"],
+    p_inf_cont, sig(p_inf_cont),
+    n_distinct(p200_inf$ticker)))
+cat(sprintf("  beta_infra_prox=%.4f SE=%.4f p=%.4f\n",
+    coef(m_inf_cont)["post_x_infra_cont"],
+    se(m_inf_cont)["post_x_infra_cont"],
+    pvalue(m_inf_cont)["post_x_infra_cont"]))
+cat("Interpretation: substitution effect independent of infrastructure boom\n")

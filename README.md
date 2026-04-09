@@ -60,6 +60,8 @@ analysis/thesis_notebook.ipynb  → All figures (Fig 1–9) + Table 4–5
 | 10 | Three-period analysis | Table 6, Fig 9 |
 | 11 | Results summary | All results |
 | 12 | Mechanism & SG&A heterogeneity | Fig 10, Fig 11 |
+| 13 | Infrastructure robustness | Fig 12 |
+| 14 | Product category validation | Fig 13 |
 
 ---
 
@@ -102,12 +104,14 @@ Scored via LLM-as-judge using a structured rubric from:
 ```
 thesis-ai-task-shock/
 ├── analysis/
-│   ├── did_main.R                  Primary DiD + robustness + three-period
-│   └── thesis_notebook.ipynb       12 sections, 11 figures (fig2 updated, fig10-11 added)
+│   ├── did_main.R                  Primary DiD + robustness + segment FE + infra proximity
+│   ├── segment_classification.py   Product segment classifier (keyword or Claude API)
+│   └── thesis_notebook.ipynb       14 sections, 13 figures
 ├── data/processed/
 │   ├── master_panel.csv            143 firms, 2020Q1–2025Q4
 │   ├── lit_continuous_scores.csv   Literature rubric scores (116 firms)
 │   ├── llm_judge_scores.csv        Holistic LLM Judge scores (143 firms)
+│   ├── segment_classification.csv  Product segment classification (116 firms)
 │   ├── event_study_coefs.csv       Quarter-by-quarter event study
 │   └── literature_rubric.json      10-criterion rubric definition
 ├── figures/
@@ -122,7 +126,9 @@ thesis-ai-task-shock/
 │   ├── fig8_score_revenue_scatter.png r=−0.274, p=0.008
 │   ├── fig9_three_period.png       1.52x intensification
 │   ├── fig10_mechanism_outcomes.png DiD betas by outcome variable
-│   └── fig11_sga_heterogeneity.png SG&A moderation within high-rep
+│   ├── fig11_sga_heterogeneity.png SG&A moderation within high-rep
+│   ├── fig12_two_sided_reallocation.png Infrastructure boom vs. substitution
+│   └── fig13_segment_validation.png    Product category validation by segment
 ├── scripts/
 │   └── collect_10k_text.py         SEC EDGAR 10-K scraper
 └── README.md
@@ -164,6 +170,9 @@ python3 -c "# See thesis_notebook.ipynb Section 2 for scoring pipeline"
 | B | Quartile Q75/Q25 (binary) | −0.286 | 0.005\*\*\* |
 | C | Placebo GM treatment (specificity) | −0.165 | 0.661 |
 | D | Pre-shock SG&A control (OVB check) | −0.476 | 0.018\*\* |
+| E | Infrastructure exclusion (n=88) | −0.475 | 0.043\*\* |
+| F | Segment × Time FE (sub-industry) | −0.778 | 0.000\*\*\* |
+| G | Continuous infra proximity control | −0.697 | 0.008\*\*\* |
 
 ## License
 Code: MIT License © 2026 Hakan Zeki Gülmez  
